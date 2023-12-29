@@ -1,0 +1,28 @@
+# Archivos y carpetas generadas por Node.js
+/node_modules
+node_modules/
+npm-debug.log*
+
+# Archivos de registro
+logs/
+*.log
+
+# Archivos de respaldo y temporales
+*.bak
+*.swp
+*.tmp
+*.zip
+*.tar.gz
+*.rar
+
+# Archivos y carpetas generados por el IDE
+.vscode/
+.idea/
+*.iml
+
+# Archivos y carpetas que contienen claves secretas o información privada
+.env
+
+# Otros
+.DS_Store
+Thumbs.db
