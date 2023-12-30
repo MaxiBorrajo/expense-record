@@ -12,6 +12,7 @@ import {
   body_must_contain_attributes,
   meetsWithEmailRequirements,
   meetsWithPasswordRequirements,
+  body_must_not_contain_attributes
 } from "../middlewares/validateRequests.middleware.js";
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.post(
   "/",
   meetsWithEmailRequirements,
   meetsWithPasswordRequirements,
+  body_must_not_contain_attributes(["_id"]),
   register
 );
 

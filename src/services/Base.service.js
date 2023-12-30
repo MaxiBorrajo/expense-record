@@ -53,7 +53,7 @@ class BaseService {
       }
     }
   
-    async updateByFilter(object, filter) {
+    async updateByFilter(filter, object) {
       try {
         const updatedObject = await this.repository.updateByFilter(filter, object);
   
@@ -77,6 +77,16 @@ class BaseService {
         const deletedObject = await this.repository.deleteByFilter(filter);
   
         return deletedObject;
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    async deleteManyByFilter(filter) {
+      try {
+        const deletedObjects = await this.repository.deleteManyByFilter(filter);
+  
+        return deletedObjects;
       } catch (error) {
         throw error;
       }

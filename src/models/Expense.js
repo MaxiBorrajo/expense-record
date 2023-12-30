@@ -8,7 +8,6 @@ const expenseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
     },
     amount: {
       type: Number,
@@ -16,14 +15,10 @@ const expenseSchema = new mongoose.Schema(
       validate: {
         validator: function(value) {
           
-          return value === 0;
+          return value != 0;
         },
         message: 'The amount must be distinct from zero'
       }
-    },
-    currency:{
-      type: String,
-      default: "USD"
     },
     category_id:{
         type: mongoose.Schema.Types.ObjectId,
@@ -31,7 +26,8 @@ const expenseSchema = new mongoose.Schema(
     },
     user_id:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
+        ref: 'users',
+        required: true
     }
   },
   {

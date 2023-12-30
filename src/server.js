@@ -5,8 +5,10 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import errorHandlerMiddleware from "./middlewares/errorHandler.middleware.js";
 
-import authRoute from "./routes/auth.routes.js"
-import userRoute from "./routes/user.routes.js"
+import authRoute from "./routes/auth.routes.js";
+import userRoute from "./routes/user.routes.js";
+import expenseRoute from "./routes/expense.routes.js";
+import categoryRoute from "./routes/category.routes.js";
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+app.use("/api/expenses", expenseRoute);
+app.use("/api/categories", categoryRoute);
 
 app.use(errorHandlerMiddleware);
 

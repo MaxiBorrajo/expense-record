@@ -86,6 +86,16 @@ class BaseRepository {
       throw error;
     }
   }
+
+  async deleteManyByFilter(filter) {
+    try {
+      const deletedObjects = await this.model.deleteMany(filter);
+
+      return deletedObjects;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default BaseRepository;

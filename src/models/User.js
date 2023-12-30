@@ -17,10 +17,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    current_amount: {
-      type: Number,
-      default: 0,
-    },
     currency: {
       type: String,
       default: "USD",
