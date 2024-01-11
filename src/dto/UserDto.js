@@ -4,5 +4,6 @@ export class UserDto {
     this.email = user.email;
     this.current_amount = user.current_amount;
     this.currency = user.currency;
+    this.createdAt = user.createdAt;
   }
 }

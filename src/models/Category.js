@@ -9,6 +9,12 @@ const categorySchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
+      required: true,
+    },
+    icon_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "icons",
+      default: "65949d729712967dc6d59c7c",
     },
   },
   {

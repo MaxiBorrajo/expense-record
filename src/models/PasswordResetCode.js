@@ -12,7 +12,7 @@ const passwordResetCodeSchema = new mongoose.Schema(
     },
     code_expiration: {
       type: Date,
-      default: new Date(Date.now() + 1000 * 60 * 10),
+      default: new Date(new Date().getTime() + 1000 * 60 * 10),
     },
     verified: {
       type: Boolean,

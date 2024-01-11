@@ -1,14 +1,29 @@
-import CategoryService from "../services/Category.service.js";
-async function getAll(req, res, next) {
+import categoryService from "../services/Categories.service.js";
+
+async function getCategories(req, res, next) {
   try {
     const uid = req.user._id;
-
-    const foundCategories = await CategoryService.getAll({
-      $or: [{ user_id: uid }, { user_id: null }],
-    });
+    const foundCategories = await categoryService.getAll(uid, req.params);
 
     return res.status(200).json({
       resource: foundCategories,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getCategoryById(req, res, next) {
+  try {
+    const uid = req.user._id;
+
+    const foundCategory = await categoryService.getByFilter({
+      user_id: uid,
+      _id: req.params.cid,
+    });
+
+    return res.status(200).json({
+      resource: foundCategory,
     });
   } catch (error) {
     next(error);
@@ -21,21 +36,21 @@ async function createCategory(req, res, next) {
 
     req.body = { ...req.body, user_id: uid };
 
-    const createdCategory = await CategoryService.create(req.body);
+    const category = await categoryService.create(req.body);
 
     return res.status(200).json({
-      resource: createdCategory,
+      resource: category,
     });
   } catch (error) {
     next(error);
   }
 }
 
-async function updateCategory(req, res, next) {
+async function updateCategoryById(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const updatedCategory = await CategoryService.updateByFilter(
+    const updatedCategory = await categoryService.updateByFilter(
       {
         user_id: uid,
         _id: req.params.cid,
@@ -52,11 +67,11 @@ async function updateCategory(req, res, next) {
   }
 }
 
-async function deleteCategory(req, res, next) {
+async function deleteCategoryById(req, res, next) {
   try {
     const uid = req.user._id;
 
-    await CategoryService.deleteByFilter({
+    await categoryService.deleteByFilter({
       user_id: uid,
       _id: req.params.cid,
     });
@@ -69,4 +84,10 @@ async function deleteCategory(req, res, next) {
   }
 }
 
-export { deleteCategory, createCategory, getAll, updateCategory };
+export {
+  createCategory,
+  deleteCategoryById,
+  getCategories,
+  updateCategoryById,
+  getCategoryById,
+};

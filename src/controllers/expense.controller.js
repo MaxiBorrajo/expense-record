@@ -13,6 +13,20 @@ async function getExpenses(req, res, next) {
     next(error);
   }
 }
+async function getAmount(req, res, next) {
+  try {
+    const uid = req.user._id;
+
+    const amount = await expenseService.getAmount(uid, req.query);
+
+    return res.status(200).json({
+      resource: amount,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getCurrentAmount(req, res, next) {
   try {
     const uid = req.user._id;
@@ -151,11 +165,12 @@ async function applyConversion(req, res, next) {
 export {
   createExpense,
   deleteExpenseById,
-  getCurrentAmount,
+  getAmount,
   getExpenseById,
   getExpenses,
   getProfitPercentage,
   getStatistics,
   updateExpenseById,
-  applyConversion
+  applyConversion,
+  getCurrentAmount
 };

@@ -4,10 +4,11 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import errorHandlerMiddleware from "./middlewares/errorHandler.middleware.js";
-
+import cors from "cors";
 import authRoute from "./routes/auth.routes.js";
 import userRoute from "./routes/user.routes.js";
 import expenseRoute from "./routes/expense.routes.js";
+import iconRoute from "./routes/icon.routes.js";
 import categoryRoute from "./routes/category.routes.js";
 
 const app = express();
@@ -16,10 +17,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-
+app.use(cors());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/expenses", expenseRoute);
+app.use("/api/icons", iconRoute);
 app.use("/api/categories", categoryRoute);
 
 app.use(errorHandlerMiddleware);

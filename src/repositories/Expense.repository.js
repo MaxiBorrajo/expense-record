@@ -11,7 +11,7 @@ class ExpenseRepository extends BaseRepository {
     try {
       const foundObject = await this.model
         .findOne(filter)
-        .populate("category_id", "category_name");
+        .populate("icon_id", "icon");
 
       return foundObject;
     } catch (error) {
@@ -24,7 +24,7 @@ class ExpenseRepository extends BaseRepository {
       const response = await this.model
         .find(query)
         .sort([[sort, order]])
-        .populate("category_id", "category_name");
+        .populate("icon_id", "icon");
 
       return response;
     } catch (error) {
@@ -114,6 +114,18 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
+  async getAmount(user_id, year, month) {
+    try {
+      const result =
+        (await this.totalIncomeOrLoss(user_id, year, month, 1)) +
+        (await this.totalIncomeOrLoss(user_id, year, month, 0));
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getCurrentAmount(user_id) {
     try {
       const result = await this.model.aggregate([
@@ -125,12 +137,14 @@ class ExpenseRepository extends BaseRepository {
         {
           $group: {
             _id: null,
-            totalAmount: { $sum: "$amount" },
+            total: {
+              $sum: "$amount",
+            },
           },
         },
       ]);
 
-      return result[0]?.totalAmount || 0;
+      return result[0]?.total || 0;
     } catch (error) {
       throw error;
     }
@@ -184,13 +198,15 @@ class ExpenseRepository extends BaseRepository {
 
       const dateCondition = {
         $gte: new Date(
-          year ? year : new Date().getFullYear(),
-          month ? month : 0,
+          year != undefined && year != null ? +year : new Date().getFullYear(),
+          month != undefined && month != null ? +month : 0,
           1
         ),
         $lte: new Date(
-          year ? year : new Date().getFullYear() + 1,
-          month ? month + 1 : 1,
+          year != undefined && year != null
+            ? year
+            : new Date().getFullYear() + 1,
+          month != undefined && month != null ? +month + 1 : 0,
           0
         ),
       };
@@ -203,7 +219,8 @@ class ExpenseRepository extends BaseRepository {
       };
 
       match.$match =
-        year || month
+        (year != undefined && year != null) ||
+        (month != undefined && month != null)
           ? { ...match.$match, createdAt: dateCondition }
           : match.$match;
 
@@ -227,18 +244,11 @@ class ExpenseRepository extends BaseRepository {
 
   async profitPercentage(user_id, year, month) {
     try {
-      const currentAmount = await this.totalIncomeOrLoss(
-        user_id,
-        year,
-        month,
-        1
-      );
-      const previousAmount = month
-        ? await this.totalIncomeOrLoss(user_id, year, month - 1, 1)
-        : await this.totalIncomeOrLoss(user_id, year - 1, month, 1);
+      const currentAmount = await this.getAmount(user_id, year, month);
+      const previousAmount = await this.getAmount(user_id, year, month - 1);
 
       const percentage = previousAmount
-        ? ((currentAmount - previousAmount) / currentAmount) * 100
+        ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
         : 0;
 
       return percentage;
@@ -253,13 +263,15 @@ class ExpenseRepository extends BaseRepository {
 
       const dateCondition = {
         $gte: new Date(
-          year ? year : new Date().getFullYear(),
-          month ? month : 0,
+          year != undefined && year != null ? year : new Date().getFullYear(),
+          month != undefined && month != null ? month : 0,
           1
         ),
         $lte: new Date(
-          year ? year : new Date().getFullYear() + 1,
-          month ? month + 1 : 1,
+          year != undefined && year != null
+            ? year
+            : new Date().getFullYear() + 1,
+          month != undefined && month != null ? month + 1 : 0,
           0
         ),
       };
@@ -272,7 +284,8 @@ class ExpenseRepository extends BaseRepository {
       };
 
       match.$match =
-        year || month
+        (year != undefined && year != null) ||
+        (month != undefined && month != null)
           ? { ...match.$match, createdAt: dateCondition }
           : match.$match;
 

@@ -13,22 +13,21 @@ const expenseSchema = new mongoose.Schema(
       type: Number,
       required: true,
       validate: {
-        validator: function(value) {
-          
+        validator: function (value) {
           return value != 0;
         },
-        message: 'The amount must be distinct from zero'
-      }
+        message: "The amount must be distinct from zero",
+      },
     },
-    category_id:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'categories'
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
     },
-    user_id:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
-        required: true
-    }
+    category_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "categories",
+    },
   },
   {
     timestamps: true,
@@ -36,9 +35,6 @@ const expenseSchema = new mongoose.Schema(
   }
 );
 
-const expense = new mongoose.model(
-  "expenses",
-  expenseSchema
-);
+const expense = new mongoose.model("expenses", expenseSchema);
 
 export default expense;

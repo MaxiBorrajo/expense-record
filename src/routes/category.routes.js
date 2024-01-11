@@ -1,38 +1,23 @@
 import express from "express";
 
 import {
-  deleteCategory,
   createCategory,
-  getAll,
-  updateCategory,
+  deleteCategoryById,
+  getCategories,
+  getCategoryById,
+  updateCategoryById,
 } from "../controllers/category.controller.js";
-
-import {
-  body_must_not_contain_attributes,
-  body_must_contain_attributes,
-} from "../middlewares/validateRequests.middleware.js";
-
-import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", isAuthenticated, getAll);
+router.get("/", getCategories);
 
-router.post(
-  "/",
-  isAuthenticated,
-  body_must_contain_attributes(["category_name"]),
-  body_must_not_contain_attributes(["_id", "user_id"]),
-  createCategory
-);
+router.get("/:cid", getCategoryById);
 
-router.put(
-  "/:cid",
-  isAuthenticated,
-  body_must_not_contain_attributes(["_id", "user_id"]),
-  updateCategory
-);
+router.delete("/:cid", deleteCategoryById);
 
-router.delete("/:cid", isAuthenticated, deleteCategory);
+router.post("/", createCategory);
+
+router.put("/:cid", updateCategoryById);
 
 export default router;

@@ -10,10 +10,6 @@ class ExpenseService extends BaseService {
     try {
       let query = {
         user_id: user_id,
-        createdAt: {
-          $gte: this.firstDateOfMonth(),
-          $lte: this.finalDateOfMonth(),
-        },
       };
 
       query = this.applyFilters(query, params);
@@ -30,48 +26,33 @@ class ExpenseService extends BaseService {
     }
   }
 
-  firstDateOfMonth() {
+  firstDateOfMonth(year, month) {
     const startDate = new Date();
-    return new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    return new Date(
+      +year != null || +year != undefined ? +year : startDate.getFullYear(),
+      +month != null || +month != undefined ? +month : startDate.getMonth(),
+      1
+    );
   }
 
-  finalDateOfMonth() {
+  finalDateOfMonth(year, month) {
     const endDate = new Date();
-    return new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
+    return new Date(
+      +year != null || +year != undefined ? +year : endDate.getFullYear(),
+      +month != null || +month != undefined
+        ? +month + 1
+        : endDate.getMonth() + 1,
+      0
+    );
   }
 
   applyFilters(query, params) {
-    if (params.startDate && params.endDate) {
+    if (params.year && params.month) {
       query = {
         ...query,
         createdAt: {
-          $gte: params.startDate,
-          $lte: params.endDate,
-        },
-      };
-    }
-
-    if (params.category) {
-      query = {
-        ...query,
-        category_id: params.category,
-      };
-    }
-
-    if (params.type && params.type === "income") {
-      query = {
-        ...query,
-        amount: {
-          $gt: 0,
-        },
-      };
-    }
-
-    if (params.type && params.type === "loss") {
-      query = {
-        ...query,
-        amount: {
-          $lt: 0,
+          $gte: this.firstDateOfMonth(params.year, params.month),
+          $lte: this.finalDateOfMonth(params.year, params.month),
         },
       };
     }
@@ -79,10 +60,7 @@ class ExpenseService extends BaseService {
     if (params.keyword) {
       query = {
         ...query,
-        $or: [
-          { title: { $regex: params.keyword, $options: "i" } },
-          { description: { $regex: params.keyword, $options: "i" } },
-        ],
+        title: { $regex: params.keyword, $options: "i" },
       };
     }
 
@@ -91,7 +69,7 @@ class ExpenseService extends BaseService {
 
   async getStatistics(user_id, year, month) {
     try {
-      return await this.repository.getStatistics(user_id, year, month);
+      return await this.repository.getStatistics(user_id, +year, +month);
     } catch (error) {
       throw error;
     }
@@ -112,6 +90,18 @@ class ExpenseService extends BaseService {
   async getProfitPercentage(user_id, year, month) {
     try {
       return await this.repository.profitPercentage(user_id, year, month);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAmount(user_id, params) {
+    try {
+      return await this.repository.getAmount(
+        user_id,
+        +params.year,
+        +params.month
+      );
     } catch (error) {
       throw error;
     }

@@ -3,13 +3,14 @@ import express from "express";
 import {
   createExpense,
   deleteExpenseById,
-  getCurrentAmount,
+  getAmount,
   getExpenseById,
   getExpenses,
   getProfitPercentage,
   getStatistics,
   updateExpenseById,
-  applyConversion
+  applyConversion,
+  getCurrentAmount
 } from "../controllers/expense.controller.js";
 
 import {
@@ -22,6 +23,8 @@ import { isAuthenticated } from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
 router.get("/", isAuthenticated, getExpenses);
+
+router.get("/amount", isAuthenticated, getAmount);
 
 router.get("/current", isAuthenticated, getCurrentAmount);
 
