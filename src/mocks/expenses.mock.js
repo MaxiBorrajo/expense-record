@@ -1,11 +1,13 @@
 import { faker } from "@faker-js/faker";
 import ExpenseService from "../services/Expense.service.js";
-import IconService from "../services/Icon.service.js";
+import CategoryService from "../services/Categories.service.js";
+
 export default async function executeExpenseMock() {
   try {
-    const icons = await IconService.getAll();
 
-    const icon_ids = icons.map((icon) => icon._id);
+    const categories = await CategoryService.getAll('658f5d7af29e79167d15970c');
+
+    const categories_ids = categories.map((category) => category._id);
 
     const titles = [
       "Tax",
@@ -34,7 +36,7 @@ export default async function executeExpenseMock() {
           to: "2023-12-31T00:00:00.000Z",
         }),
         user_id: "658f5d7af29e79167d15970c",
-        icon_id: faker.helpers.arrayElement(icon_ids),
+        category_id: faker.helpers.arrayElement(categories_ids),
       });
     }
 
@@ -50,7 +52,7 @@ export default async function executeExpenseMock() {
           to: "2024-01-31T00:00:00.000Z",
         }),
         user_id: "658f5d7af29e79167d15970c",
-        icon_id: faker.helpers.arrayElement(icon_ids),
+        category_id: faker.helpers.arrayElement(categories_ids),
       });
     }
   } catch (error) {

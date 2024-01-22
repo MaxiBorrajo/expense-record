@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ExpenseService from "../services/Expense.service.js"
 
 const categorySchema = new mongoose.Schema(
   {
@@ -9,7 +10,6 @@ const categorySchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      required: true,
     },
     icon_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +22,17 @@ const categorySchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+categorySchema.post("deleteOne", async function (doc, next) {
+  const expenses = await ExpenseService.getByFilter({category_id: doc.id})
+
+  expenses.forEach(async (expense) => {
+    expense.category_id = '65a15641908ecc879cc67b02';
+    await expense.save();
+  })
+
+  next();
+});
 
 const category = new mongoose.model("categories", categorySchema);
 

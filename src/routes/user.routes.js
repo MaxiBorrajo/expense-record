@@ -6,6 +6,7 @@ import { body_must_not_contain_attributes } from "../middlewares/validateRequest
 
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
+import { multerUploads, processImage } from "../middlewares/uploadsImage.middleware.js";
 const router = express.Router();
 
 router.get(
@@ -18,6 +19,8 @@ router.put(
   "/",
   isAuthenticated,
   body_must_not_contain_attributes(["_id", "email", "password", "oauthuser"]),
+  multerUploads, 
+  processImage,
   updateUser
 );
 

@@ -27,11 +27,11 @@ async function getAmount(req, res, next) {
   }
 }
 
-async function getCurrentAmount(req, res, next) {
+async function getBalance(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const amount = await expenseService.getCurrentAmount(uid);
+    const amount = await expenseService.getBalance(uid);
 
     return res.status(200).json({
       resource: amount,
@@ -65,7 +65,25 @@ async function getStatistics(req, res, next) {
     const statistics = await expenseService.getStatistics(
       uid,
       req.query.year,
-      req.query.month
+    );
+
+    return res.status(200).json({
+      resource: statistics,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getStatisticsByCategory(req, res, next) {
+  try {
+    const uid = req.user._id;
+
+    const statistics = await expenseService.getStatisticsByCategory(
+      uid,
+      req.query.year,
+      req.query.month,
+      req.query.type
     );
 
     return res.status(200).json({
@@ -80,11 +98,7 @@ async function getProfitPercentage(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const percentage = await expenseService.getProfitPercentage(
-      uid,
-      req.query.year,
-      req.query.month
-    );
+    const percentage = await expenseService.getProfitPercentage(uid);
 
     return res.status(200).json({
       resource: percentage,
@@ -99,10 +113,11 @@ async function createExpense(req, res, next) {
     const uid = req.user._id;
 
     req.body = { ...req.body, user_id: uid };
-    const percentage = await expenseService.create(req.body);
+
+    const expense = await expenseService.create(req.body);
 
     return res.status(200).json({
-      resource: percentage,
+      resource: expense,
     });
   } catch (error) {
     next(error);
@@ -151,7 +166,11 @@ async function applyConversion(req, res, next) {
   try {
     const uid = req.user._id;
 
-    await expenseService.applyConversion(uid, req.body.old_currency, req.body.new_currency);
+    await expenseService.applyConversion(
+      uid,
+      req.body.old_currency,
+      req.body.new_currency
+    );
 
     return res.status(200).json({
       message: "Currency changed successfully",
@@ -160,7 +179,6 @@ async function applyConversion(req, res, next) {
     next(error);
   }
 }
-
 
 export {
   createExpense,
@@ -172,5 +190,6 @@ export {
   getStatistics,
   updateExpenseById,
   applyConversion,
-  getCurrentAmount
+  getBalance,
+  getStatisticsByCategory
 };

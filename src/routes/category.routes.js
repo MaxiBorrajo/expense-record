@@ -8,16 +8,18 @@ import {
   updateCategoryById,
 } from "../controllers/category.controller.js";
 
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
+
 const router = express.Router();
 
-router.get("/", getCategories);
+router.get("/", isAuthenticated, getCategories);
 
-router.get("/:cid", getCategoryById);
+router.get("/:cid", isAuthenticated, getCategoryById);
 
-router.delete("/:cid", deleteCategoryById);
+router.delete("/:cid", isAuthenticated, deleteCategoryById);
 
-router.post("/", createCategory);
+router.post("/", isAuthenticated, createCategory);
 
-router.put("/:cid", updateCategoryById);
+router.put("/:cid", isAuthenticated, updateCategoryById);
 
 export default router;

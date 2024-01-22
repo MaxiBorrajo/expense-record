@@ -10,7 +10,8 @@ import {
   getStatistics,
   updateExpenseById,
   applyConversion,
-  getCurrentAmount
+  getBalance,
+  getStatisticsByCategory,
 } from "../controllers/expense.controller.js";
 
 import {
@@ -22,19 +23,22 @@ import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", isAuthenticated, getExpenses);
+router.get("/", isAuthenticated, getExpenses); //✓
 
-router.get("/amount", isAuthenticated, getAmount);
+router.get("/amount", isAuthenticated, getAmount); //✓
 
-router.get("/current", isAuthenticated, getCurrentAmount);
+router.get("/balance", isAuthenticated, getBalance); //✓
 
-router.get("/statistics", isAuthenticated, getStatistics);
+router.get("/statistics", isAuthenticated, getStatistics); //✓
 
-router.get("/profitPercentage", isAuthenticated, getProfitPercentage);
+router.get("/statisticsByCategory", isAuthenticated, getStatisticsByCategory); //✓
 
-router.get("/:eid", isAuthenticated, getExpenseById);
+router.get("/change", isAuthenticated, getProfitPercentage); //✓
+
+router.get("/:eid", isAuthenticated, getExpenseById); //✓
 
 router.post(
+  //✓
   "/",
   isAuthenticated,
   body_must_contain_attributes(["title", "amount"]),
@@ -42,7 +46,7 @@ router.post(
   createExpense
 );
 
-router.post(
+router.put(
   "/conversion",
   isAuthenticated,
   body_must_contain_attributes(["old_currency", "new_currency"]),

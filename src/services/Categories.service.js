@@ -9,10 +9,13 @@ class CategoryService extends BaseService {
   async getAll(user_id, params) {
     try {
       let query = {
-        user_id: user_id,
+        $or:[
+          {user_id: user_id},
+          {user_id: null}
+        ]
       };
 
-      if (params.keyword) {
+      if (params && params.keyword) {
         query = {
           ...query,
           category_name: { $regex: params.keyword, $options: "i" },
@@ -26,6 +29,7 @@ class CategoryService extends BaseService {
       throw error;
     }
   }
+
 }
 
 export default new CategoryService();

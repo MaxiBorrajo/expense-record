@@ -26,50 +26,103 @@ class ExpenseService extends BaseService {
     }
   }
 
-  firstDateOfMonth(year, month) {
+  firstDate(year, month) {
     const startDate = new Date();
     return new Date(
-      +year != null || +year != undefined ? +year : startDate.getFullYear(),
-      +month != null || +month != undefined ? +month : startDate.getMonth(),
+      year != null || year != undefined ? +year : startDate.getFullYear(),
+      month != null || month != undefined ? +month : startDate.getMonth(),
       1
     );
   }
 
-  finalDateOfMonth(year, month) {
+  finalDate(year, month) {
     const endDate = new Date();
     return new Date(
-      +year != null || +year != undefined ? +year : endDate.getFullYear(),
-      +month != null || +month != undefined
-        ? +month + 1
-        : endDate.getMonth() + 1,
+      year != null || year != undefined ? +year : endDate.getFullYear(),
+      month != null || month != undefined ? +month + 1 : endDate.getMonth() + 1,
       0
     );
   }
 
   applyFilters(query, params) {
-    if (params.year && params.month) {
+    if (params && params.year && !params.month && !params.day) {
       query = {
         ...query,
         createdAt: {
-          $gte: this.firstDateOfMonth(params.year, params.month),
-          $lte: this.finalDateOfMonth(params.year, params.month),
+          $gte: new Date(+params.year, 0, 1),
+          $lte: new Date(+params.year + 1, 0, 0),
         },
       };
     }
 
-    if (params.keyword) {
+    if (params && params.year && params.month && !params.day) {
+      query = {
+        ...query,
+        createdAt: {
+          $gte: new Date(+params.year, +params.month, 1),
+          $lte: new Date(+params.year, +params.month + 1, 0),
+        },
+      };
+    }
+
+    if (params && params.year && params.month && params.day) {
+      query = {
+        ...query,
+        createdAt: {
+          $gte: new Date(+params.year, +params.month, +params.day, 0, 0, 0),
+          $lte: new Date(+params.year, +params.month, +params.day + 1, 0, 0, 0),
+        },
+      };
+    }
+
+    if (params && params.keyword) {
       query = {
         ...query,
         title: { $regex: params.keyword, $options: "i" },
       };
     }
 
+    if (params && params.category) {
+      query = {
+        ...query,
+        category_id: params.category,
+      };
+    }
+
+    if (params && params.type) {
+      query = {
+        ...query,
+        amount: +params.type
+          ? {
+              $gt: 0,
+            }
+          : {
+              $lte: 0,
+            },
+      };
+    }
+
     return query;
   }
 
-  async getStatistics(user_id, year, month) {
+  async getStatistics(user_id, year) {
     try {
-      return await this.repository.getStatistics(user_id, +year, +month);
+      return await this.repository.getStatistics(
+        user_id,
+        +year,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getStatisticsByCategory(user_id, year, month) {
+    try {
+      return await this.repository.getStatisticsByCategory(
+        user_id,
+        year,
+        month
+      );
     } catch (error) {
       throw error;
     }
@@ -87,9 +140,9 @@ class ExpenseService extends BaseService {
     }
   }
 
-  async getProfitPercentage(user_id, year, month) {
+  async getProfitPercentage(user_id) {
     try {
-      return await this.repository.profitPercentage(user_id, year, month);
+      return await this.repository.profitPercentage(user_id);
     } catch (error) {
       throw error;
     }
@@ -99,17 +152,18 @@ class ExpenseService extends BaseService {
     try {
       return await this.repository.getAmount(
         user_id,
-        +params.year,
-        +params.month
+        params.year,
+        params.month,
+        params.type
       );
     } catch (error) {
       throw error;
     }
   }
 
-  async getCurrentAmount(user_id) {
+  async getBalance(user_id) {
     try {
-      return await this.repository.getCurrentAmount(user_id);
+      return await this.repository.getBalance(user_id);
     } catch (error) {
       throw error;
     }

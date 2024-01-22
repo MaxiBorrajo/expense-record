@@ -3,7 +3,7 @@ import categoryService from "../services/Categories.service.js";
 async function getCategories(req, res, next) {
   try {
     const uid = req.user._id;
-    const foundCategories = await categoryService.getAll(uid, req.params);
+    const foundCategories = await categoryService.getAll(uid, req.query);
 
     return res.status(200).json({
       resource: foundCategories,

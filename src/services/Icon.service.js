@@ -10,11 +10,11 @@ class IconService extends BaseService {
     try {
       let query = {};
 
-      if (params.keyword) {
+      if (params && params.keyword) {
         query = { title: { $regex: params.keyword, $options: "i" } };
       }
 
-      const result = await this.repository.getAll();
+      const result = await this.repository.getAll(query);
 
       return result;
     } catch (error) {

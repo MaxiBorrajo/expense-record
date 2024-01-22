@@ -8,10 +8,15 @@ class ExpenseRepository extends BaseRepository {
   }
 
   async getByFilter(filter) {
+    //✓
     try {
-      const foundObject = await this.model
-        .findOne(filter)
-        .populate("icon_id", "icon");
+      const foundObject = await this.model.findOne(filter).populate({
+        path: "category_id",
+        populate: {
+          path: "icon_id",
+          model: "icons",
+        },
+      });
 
       return foundObject;
     } catch (error) {
@@ -20,11 +25,18 @@ class ExpenseRepository extends BaseRepository {
   }
 
   async getAll(query, sort = "createdAt", order = "desc") {
+    //✓
     try {
       const response = await this.model
         .find(query)
         .sort([[sort, order]])
-        .populate("icon_id", "icon");
+        .populate({
+          path: "category_id",
+          populate: {
+            path: "icon_id",
+            model: "icons",
+          },
+        });
 
       return response;
     } catch (error) {
@@ -32,93 +44,73 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
-  async getStatistics(user_id, year, month) {
+  async getStatistics(user_id, year) {
     try {
-      return {
-        totalAmount:
-          (await this.totalIncomeOrLoss(user_id, null, null, 1)) +
-          (await this.totalIncomeOrLoss(user_id, null, null, 0)),
-
-        totalAverageIncome: await this.totalAverageIncomeOrLoss(
-          user_id,
-          null,
-          null,
-          1
-        ),
-        totalAverageLoss: await this.totalAverageIncomeOrLoss(
-          user_id,
-          null,
-          null,
-          0
-        ),
-        totalAmountOfYear:
-          (await this.totalIncomeOrLoss(user_id, year, null, 1)) +
-          (await this.totalIncomeOrLoss(user_id, year, null, 0)),
-        totalAverageAmountPerYear: await this.averageTotalAmountBy(
-          user_id,
-          "year"
-        ),
-        totalIncomeOfYear: await this.totalIncomeOrLoss(user_id, year, null, 1),
-        totalLossOfYear: await this.totalIncomeOrLoss(user_id, year, null, 0),
-        averageIncomeOfYear: await this.totalAverageIncomeOrLoss(
-          user_id,
-          year,
-          null,
-          1
-        ),
-        averageLossOfYear: await this.totalAverageIncomeOrLoss(
-          user_id,
-          year,
-          null,
-          0
-        ),
-        profitPercentageOfYear: await this.profitPercentage(
-          user_id,
-          year,
-          null
-        ),
-        totalAmountOfMonth:
-          (await this.totalIncomeOrLoss(user_id, year, month, 1)) +
-          (await this.totalIncomeOrLoss(user_id, year, month, 0)),
-        totalAverageAmountPerMonth: await this.averageTotalAmountBy(
-          user_id,
-          "month"
-        ),
-        totalIncomeOfMonth: await this.totalIncomeOrLoss(
-          user_id,
-          year,
-          month,
-          1
-        ),
-        totalLossOfMonth: await this.totalIncomeOrLoss(user_id, year, month, 0),
-        averageIncomeOfMonth: await this.totalAverageIncomeOrLoss(
-          user_id,
-          year,
-          month,
-          1
-        ),
-        averageLossOfMonth: await this.totalAverageIncomeOrLoss(
-          user_id,
-          year,
-          month,
-          0
-        ),
-        profitPercentageOfMonth: await this.profitPercentage(
-          user_id,
-          year,
-          month
-        ),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getAmount(user_id, year, month) {
-    try {
-      const result =
-        (await this.totalIncomeOrLoss(user_id, year, month, 1)) +
-        (await this.totalIncomeOrLoss(user_id, year, month, 0));
+      const result = await this.model.aggregate([
+        {
+          $match: {
+            user_id: user_id,
+            createdAt: {
+              $gte: new Date(year ? +year : new Date().getFullYear(), 0, 1),
+              $lt: new Date(
+                year ? +year + 1 : new Date().getFullYear() + 1,
+                0,
+                1
+              ),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+            },
+            total: {
+              $sum: "$amount",
+            },
+            totalIncome: {
+              $sum: {
+                $cond: {
+                  if: { $gt: ["$amount", 0] },
+                  then: "$amount",
+                  else: 0,
+                },
+              },
+            },
+            totalLoss: {
+              $sum: {
+                $cond: {
+                  if: { $lt: ["$amount", 0] },
+                  then: "$amount",
+                  else: 0,
+                },
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { year: "$_id.year" },
+            total: { $sum: "$total" },
+            totalIncome: { $sum: "$totalIncome" },
+            totalLoss: { $sum: "$totalLoss" },
+            months: {
+              $push: {
+                month: "$_id.month",
+                total: "$total",
+                totalIncome: "$totalIncome",
+                totalLoss: "$totalLoss",
+              },
+            },
+          },
+        },
+        {
+          $sort: {
+            "_id.year": 1,
+          },
+        },
+      ]);
 
       return result;
     } catch (error) {
@@ -126,102 +118,102 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
-  async getCurrentAmount(user_id) {
+  async getStatisticsByCategory(user_id, year, month, type) {
     try {
       const result = await this.model.aggregate([
         {
           $match: {
             user_id: user_id,
+            createdAt: {
+              $gte: new Date(
+                year != null && year != undefined
+                  ? +year
+                  : new Date().getFullYear(),
+                month != null &&
+                month != undefined &&
+                year != null &&
+                year != undefined
+                  ? +month
+                  : 0,
+                1
+              ),
+              $lte: new Date(
+                year != null && year != undefined
+                  ? +year
+                  : new Date().getFullYear(),
+                month != null && month != undefined ? +month + 1 : 11,
+                month != null &&
+                month != undefined &&
+                year != null &&
+                year != undefined
+                  ? 0
+                  : 31
+              ),
+            },
+            amount: type ? { $gt: 0 } : { $lte: 0 },
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category_id",
+            foreignField: "_id",
+            as: "category",
           },
         },
         {
           $group: {
-            _id: null,
+            _id: "$category_id",
             total: {
               $sum: "$amount",
+            },
+            categoryInfo: {
+              $first: "$category",
             },
           },
         },
       ]);
 
-      return result[0]?.total || 0;
+      return result;
     } catch (error) {
       throw error;
     }
   }
 
-  async averageTotalAmountBy(user_id, filter) {
-    const groupBy = this.selectGroupBy(filter);
-
+  async getAmount(user_id, year, month, type) {
+    //✓
     try {
-      const result = await this.model.aggregate([
-        {
-          $match: {
-            user_id: user_id,
-          },
-        },
-        {
-          $group: {
-            _id: groupBy,
-            totalAmount: { $sum: "$amount" },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            averageTotalAmount: { $avg: "$totalAmount" },
-          },
-        },
-      ]);
-
-      return result[0]?.averageTotalAmount || 0;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  selectGroupBy(filter) {
-    if (filter === "year") {
-      return { $year: "$createdAt" };
-    }
-
-    if (filter === "month") {
-      return { $month: "$createdAt" };
-    }
-
-    return null;
-  }
-
-  async totalIncomeOrLoss(user_id, year, month, income) {
-    try {
-      const amountCondition = income ? { $gt: 0 } : { $lt: 0 };
-
-      const dateCondition = {
-        $gte: new Date(
-          year != undefined && year != null ? +year : new Date().getFullYear(),
-          month != undefined && month != null ? +month : 0,
-          1
-        ),
-        $lte: new Date(
-          year != undefined && year != null
-            ? year
-            : new Date().getFullYear() + 1,
-          month != undefined && month != null ? +month + 1 : 0,
-          0
-        ),
-      };
+      const amountCondition = +type ? { $gt: 0 } : { $lte: 0 };
 
       const match = {
         $match: {
           user_id: user_id,
-          amount: amountCondition,
+          createdAt: {
+            $gte: new Date(
+              year != null && year != undefined
+                ? +year
+                : new Date().getFullYear(),
+              month != null && month != undefined
+                ? +month
+                : new Date().getMonth(),
+              1
+            ),
+            $lte: new Date(
+              year != null && year != undefined
+                ? +year
+                : new Date().getFullYear(),
+              month != null && month != undefined
+                ? +month + 1
+                : new Date().getMonth() + 1,
+              0
+            ),
+          },
         },
       };
 
       match.$match =
-        (year != undefined && year != null) ||
-        (month != undefined && month != null)
-          ? { ...match.$match, createdAt: dateCondition }
+        type != undefined && type != null
+          ? { ...match.$match, amount: amountCondition }
           : match.$match;
 
       const result = await this.model.aggregate([
@@ -242,64 +234,52 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
-  async profitPercentage(user_id, year, month) {
+  async profitPercentage(user_id) {
+    //✓
     try {
-      const currentAmount = await this.getAmount(user_id, year, month);
-      const previousAmount = await this.getAmount(user_id, year, month - 1);
+      const currentAmount = await this.getAmount(user_id);
+      const previousAmount = await this.getAmount(
+        user_id,
+        new Date().getMonth() - 1 === -1
+          ? new Date().getFullYear() - 1
+          : new Date().getFullYear(),
+        new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
+      );
 
       const percentage = previousAmount
         ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
         : 0;
 
-      return percentage;
+      const nominal = previousAmount ? currentAmount - previousAmount : 0;
+
+      return {
+        percentage: percentage,
+        nominal: nominal,
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async totalAverageIncomeOrLoss(user_id, year, month, income) {
+  async getBalance(user_id) {
     try {
-      const amountCondition = income ? { $gt: 0 } : { $lt: 0 };
-
-      const dateCondition = {
-        $gte: new Date(
-          year != undefined && year != null ? year : new Date().getFullYear(),
-          month != undefined && month != null ? month : 0,
-          1
-        ),
-        $lte: new Date(
-          year != undefined && year != null
-            ? year
-            : new Date().getFullYear() + 1,
-          month != undefined && month != null ? month + 1 : 0,
-          0
-        ),
-      };
-
-      const match = {
-        $match: {
-          user_id: user_id,
-          amount: amountCondition,
-        },
-      };
-
-      match.$match =
-        (year != undefined && year != null) ||
-        (month != undefined && month != null)
-          ? { ...match.$match, createdAt: dateCondition }
-          : match.$match;
-
       const result = await this.model.aggregate([
-        match,
+        {
+          $match: {
+            user_id: user_id,
+          },
+        },
         {
           $group: {
             _id: null,
-            averageExpense: { $avg: "$amount" },
+            total: {
+              $sum: "$amount",
+            },
           },
         },
       ]);
 
-      return result[0]?.averageExpense || 0;
+      return result[0]?.total || 0;
     } catch (error) {
       throw error;
     }
