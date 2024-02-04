@@ -22,6 +22,7 @@ router.post(
   meetsWithEmailRequirements,
   meetsWithPasswordRequirements,
   body_must_not_contain_attributes(["_id"]),
+  body_must_contain_attributes(['lastName', 'firstName']),
   register
 );
 
