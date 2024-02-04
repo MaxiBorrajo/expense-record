@@ -18,14 +18,6 @@ async function updateUser(req, res, next) {
   try {
     const uid = req.user._id;
 
-    if(req.file && req.file.publicId && req.file.url){
-      req.body = {
-        ...req.body,
-        publicId: req.file.publicId,
-        urlProfilePhoto: req.file.url
-      }
-    }
-
     const updateUser = await userService.updateById(uid, req.body);
 
     return res.status(200).json({

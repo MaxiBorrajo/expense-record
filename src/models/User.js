@@ -2,15 +2,14 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { deleteImageInCloud } from "../middlewares/uploadsImage.middleware.js";
 //schema
 const userSchema = new mongoose.Schema(
   {
-    first_name: {
+    firstName: {
       type: String,
       required: true,
     },
-    last_name: {
+    lastName: {
       type: String,
       required: true,
     },
@@ -29,15 +28,6 @@ const userSchema = new mongoose.Schema(
     currency: {
       type: String,
       default: "USD",
-    },
-    publicId: {
-      type: String,
-      default: "default",
-    },
-    urlProfilePhoto: {
-      type: String,
-      default:
-        "https://res.cloudinary.com/dixntuyk8/image/upload/v1693830223/x1vdmydenrkd3luzvjv6.png",
     },
   },
   {
@@ -72,14 +62,6 @@ userSchema.methods.generateAuthToken = async function (user) {
     }
   );
 };
-
-userSchema.post("deleteOne", async function (doc, next) {
-  if (doc.publicId != "default") {
-    await deleteImageInCloud(doc.publicId);
-  }
-
-  next();
-});
 
 const user = new mongoose.model("users", userSchema);
 

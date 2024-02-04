@@ -150,7 +150,7 @@ class ExpenseRepository extends BaseRepository {
                   : 31
               ),
             },
-            amount: type ? { $gt: 0 } : { $lte: 0 },
+            amount: +type ? { $gt: 0 } : { $lte: 0 },
           },
         },
         {

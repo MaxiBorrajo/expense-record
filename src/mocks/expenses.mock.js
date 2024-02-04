@@ -32,10 +32,10 @@ export default async function executeExpenseMock() {
         //   ? 100
         //   : faker.finance.amount({ min: -1000000, max: 1000000, dec: 2 }),
         createdAt: faker.date.between({
-          from: "2023-12-01T00:00:00.000Z",
-          to: "2023-12-31T00:00:00.000Z",
+          from: "2023-11-01T00:00:00.000Z",
+          to: "2023-11-31T00:00:00.000Z",
         }),
-        user_id: "658f5d7af29e79167d15970c",
+        user_id: "6591e79943db35ce3c9f5fd9",
         category_id: faker.helpers.arrayElement(categories_ids),
       });
     }
@@ -48,10 +48,10 @@ export default async function executeExpenseMock() {
         //   ? 100
         //   : faker.finance.amount({ min: -1000000, max: 1000000, dec: 2 }),
         createdAt: faker.date.between({
-          from: "2024-01-01T00:00:00.000Z",
-          to: "2024-01-31T00:00:00.000Z",
+          from: "2024-02-01T00:00:00.000Z",
+          to: "2024-02-31T00:00:00.000Z",
         }),
-        user_id: "658f5d7af29e79167d15970c",
+        user_id: "6591e79943db35ce3c9f5fd9",
         category_id: faker.helpers.arrayElement(categories_ids),
       });
     }

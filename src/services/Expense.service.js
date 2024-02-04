@@ -116,12 +116,13 @@ class ExpenseService extends BaseService {
     }
   }
 
-  async getStatisticsByCategory(user_id, year, month) {
+  async getStatisticsByCategory(user_id, year, month, type) {
     try {
       return await this.repository.getStatisticsByCategory(
         user_id,
         year,
-        month
+        month,
+        type
       );
     } catch (error) {
       throw error;
