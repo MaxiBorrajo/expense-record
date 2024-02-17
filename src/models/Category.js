@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import ExpenseService from "../services/Expense.service.js"
+import ExpenseService from "../services/Expense.service.js";
 
 const categorySchema = new mongoose.Schema(
   {
@@ -24,12 +24,14 @@ const categorySchema = new mongoose.Schema(
 );
 
 categorySchema.post("deleteOne", async function (doc, next) {
-  const expenses = await ExpenseService.getByFilter({category_id: doc.id})
+  const expenses = await ExpenseService.getByFilter({ category_id: doc.id });
 
-  expenses.forEach(async (expense) => {
-    expense.category_id = '65a15641908ecc879cc67b02';
-    await expense.save();
-  })
+  if (expenses && expenses.length > 0) {
+    expenses.forEach(async (expense) => {
+      expense.category_id = "65a15641908ecc879cc67b02";
+      await expense.save();
+    });
+  }
 
   next();
 });
