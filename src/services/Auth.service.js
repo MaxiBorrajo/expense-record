@@ -135,7 +135,7 @@ class AuthService extends BaseService {
             
                     <p>This verification code will expire in 10 minutes. If you did not request this change, you can ignore this email.</p>
             
-                    <p>Thank you,<br>The KANBAN Team</p>
+                    <p>Thank you,<br>Expense Record</p>
                 </div>
             
                 <div class="footer">
