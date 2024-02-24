@@ -100,7 +100,7 @@ export class InvalidEmailError extends BadRequestError {
 export class InvalidPasswordError extends BadRequestError {
   constructor() {
     super(
-      `The value of 'password' attribute must have at least one lowercase letter, one uppercase letter, one digit, one special character, and be 8 characters or longer`
+      `The value of 'password' attribute must have at least one lowercase letter, one uppercase letter, one digit, one special character (@$!%*?&), and be 8 characters or longer`
     );
   }
 }
