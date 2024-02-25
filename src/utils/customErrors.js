@@ -41,8 +41,6 @@ export class InvalidCodeError extends BadRequestError {
   }
 }
 
-
-
 export class PasswordResetCodeAlreadyVerifiedError extends BadRequestError {
   constructor() {
     super(`The password reset code has been already verified`);
@@ -118,8 +116,8 @@ export class DatabaseConnectionFailedError extends ServerError {
 }
 
 export class UnauthorizedError extends CustomError {
-  constructor() {
-    super(403, "Unauthorized");
+  constructor(message) {
+    super(403, message ? message : "Unauthorized");
   }
 }
 

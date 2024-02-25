@@ -246,6 +246,8 @@ class AuthService extends BaseService {
   }
 
   validateCodeExpiration(expiration) {
+    console.log(expiration)
+    console.log(new Date())
     if (new Date() > expiration) {
       throw new errors.CODE_EXPIRED();
     }
