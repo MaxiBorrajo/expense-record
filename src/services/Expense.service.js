@@ -26,24 +26,6 @@ class ExpenseService extends BaseService {
     }
   }
 
-  firstDate(year, month) {
-    const startDate = new Date();
-    return new Date(
-      year != null || year != undefined ? +year : startDate.getFullYear(),
-      month != null || month != undefined ? +month : startDate.getMonth(),
-      1
-    );
-  }
-
-  finalDate(year, month) {
-    const endDate = new Date();
-    return new Date(
-      year != null || year != undefined ? +year : endDate.getFullYear(),
-      month != null || month != undefined ? +month + 1 : endDate.getMonth() + 1,
-      0
-    );
-  }
-
   applyFilters(query, params) {
     if (params && params.year && !params.month && !params.day) {
       query = {
@@ -63,6 +45,11 @@ class ExpenseService extends BaseService {
           $lte: new Date(+params.year, +params.month + 1, 0),
         },
       };
+
+      console.log({
+        $gte: new Date(+params.year, +params.month, 1),
+        $lte: new Date(+params.year, +params.month + 1, 0),
+      })
     }
 
     if (params && params.year && params.month && params.day) {
