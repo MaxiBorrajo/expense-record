@@ -14,6 +14,8 @@ class ExpenseService extends BaseService {
 
       query = this.applyFilters(query, params);
 
+      console.log(query);
+
       const result = await this.repository.getAll(
         query,
         params.sort,
