@@ -58,7 +58,7 @@ class ExpenseRepository extends BaseRepository {
               },
               {
                 createdAt: {
-                  $lte: new Date(
+                  $lt: new Date(
                     year ? +year + 1 : new Date().getFullYear() + 1,
                     0,
                     1
@@ -220,14 +220,14 @@ class ExpenseRepository extends BaseRepository {
             },
             {
               createdAt: {
-                $lte: new Date(
+                $lt: new Date(
                   year != null && year != undefined
                     ? +year
                     : new Date().getFullYear(),
                   month != null && month != undefined
                     ? +month + 1
                     : new Date().getMonth() + 1,
-                  0
+                  1
                 ),
               },
             },
