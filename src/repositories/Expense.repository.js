@@ -50,14 +50,22 @@ class ExpenseRepository extends BaseRepository {
         {
           $match: {
             user_id: user_id,
-            createdAt: {
-              $gte: new Date(year ? +year : new Date().getFullYear(), 0, 1),
-              $lt: new Date(
-                year ? +year + 1 : new Date().getFullYear() + 1,
-                0,
-                1
-              ),
-            },
+            $and: [
+              {
+                createdAt: {
+                  $gte: new Date(year ? +year : new Date().getFullYear(), 0, 1),
+                },
+              },
+              {
+                createdAt: {
+                  $lte: new Date(
+                    year ? +year + 1 : new Date().getFullYear() + 1,
+                    0,
+                    1
+                  ),
+                },
+              },
+            ],
           },
         },
         {
@@ -124,32 +132,40 @@ class ExpenseRepository extends BaseRepository {
         {
           $match: {
             user_id: user_id,
-            createdAt: {
-              $gte: new Date(
-                year != null && year != undefined
-                  ? +year
-                  : new Date().getFullYear(),
-                month != null &&
-                month != undefined &&
-                year != null &&
-                year != undefined
-                  ? +month
-                  : 0,
-                1
-              ),
-              $lte: new Date(
-                year != null && year != undefined
-                  ? +year
-                  : new Date().getFullYear(),
-                month != null && month != undefined ? +month + 1 : 11,
-                month != null &&
-                month != undefined &&
-                year != null &&
-                year != undefined
-                  ? 0
-                  : 31
-              ),
-            },
+            $and: [
+              {
+                createdAt: {
+                  $gte: new Date(
+                    year != null && year != undefined
+                      ? +year
+                      : new Date().getFullYear(),
+                    month != null &&
+                    month != undefined &&
+                    year != null &&
+                    year != undefined
+                      ? +month
+                      : 0,
+                    1
+                  ),
+                },
+              },
+              {
+                createdAt: {
+                  $lte: new Date(
+                    year != null && year != undefined
+                      ? +year
+                      : new Date().getFullYear(),
+                    month != null && month != undefined ? +month + 1 : 11,
+                    month != null &&
+                    month != undefined &&
+                    year != null &&
+                    year != undefined
+                      ? 0
+                      : 31
+                  ),
+                },
+              },
+            ],
             amount: +type ? { $gt: 0 } : { $lte: 0 },
           },
         },
@@ -188,26 +204,34 @@ class ExpenseRepository extends BaseRepository {
       const match = {
         $match: {
           user_id: user_id,
-          createdAt: {
-            $gte: new Date(
-              year != null && year != undefined
-                ? +year
-                : new Date().getFullYear(),
-              month != null && month != undefined
-                ? +month
-                : new Date().getMonth(),
-              1
-            ),
-            $lte: new Date(
-              year != null && year != undefined
-                ? +year
-                : new Date().getFullYear(),
-              month != null && month != undefined
-                ? +month + 1
-                : new Date().getMonth() + 1,
-              0
-            ),
-          },
+          $and: [
+            {
+              createdAt: {
+                $gte: new Date(
+                  year != null && year != undefined
+                    ? +year
+                    : new Date().getFullYear(),
+                  month != null && month != undefined
+                    ? +month
+                    : new Date().getMonth(),
+                  1
+                ),
+              },
+            },
+            {
+              createdAt: {
+                $lte: new Date(
+                  year != null && year != undefined
+                    ? +year
+                    : new Date().getFullYear(),
+                  month != null && month != undefined
+                    ? +month + 1
+                    : new Date().getMonth() + 1,
+                  0
+                ),
+              },
+            },
+          ],
         },
       };
 
@@ -245,20 +269,25 @@ class ExpenseRepository extends BaseRepository {
           : new Date().getFullYear(),
         new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
       );
-        console.log( new Date().getMonth() - 1 === -1
-        ? new Date().getFullYear() - 1
-        : new Date().getFullYear(),)
-        console.log( new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1)
-      console.log(currentAmount)
-      console.log(previousAmount)
+      console.log(
+        new Date().getMonth() - 1 === -1
+          ? new Date().getFullYear() - 1
+          : new Date().getFullYear()
+      );
+      console.log(
+        new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
+      );
+      console.log(currentAmount);
+      console.log(previousAmount);
 
-      const percentage = previousAmount && currentAmount != 0
-        ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
-        : 0;
+      const percentage =
+        previousAmount && currentAmount != 0
+          ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
+          : 0;
 
       const nominal = previousAmount ? currentAmount - previousAmount : 0;
 
-      console.log(nominal)
+      console.log(nominal);
       return {
         percentage: percentage,
         nominal: nominal,
