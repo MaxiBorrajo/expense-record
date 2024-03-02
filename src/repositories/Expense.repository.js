@@ -245,7 +245,10 @@ class ExpenseRepository extends BaseRepository {
           : new Date().getFullYear(),
         new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
       );
-
+        console.log( new Date().getMonth() - 1 === -1
+        ? new Date().getFullYear() - 1
+        : new Date().getFullYear(),)
+        console.log( new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1)
       console.log(currentAmount)
       console.log(previousAmount)
 
