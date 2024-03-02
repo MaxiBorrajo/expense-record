@@ -246,12 +246,16 @@ class ExpenseRepository extends BaseRepository {
         new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
       );
 
+      console.log(currentAmount)
+      console.log(previousAmount)
+
       const percentage = previousAmount && currentAmount != 0
         ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
         : 0;
 
       const nominal = previousAmount ? currentAmount - previousAmount : 0;
 
+      console.log(nominal)
       return {
         percentage: percentage,
         nominal: nominal,
