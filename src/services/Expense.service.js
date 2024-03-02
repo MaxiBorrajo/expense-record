@@ -14,8 +14,6 @@ class ExpenseService extends BaseService {
 
       query = this.applyFilters(query, params);
 
-      console.log(query);
-
       const result = await this.repository.getAll(
         query,
         params.sort,
@@ -32,35 +30,45 @@ class ExpenseService extends BaseService {
     if (params && params.year && !params.month && !params.day) {
       query = {
         ...query,
-        createdAt: {
-          $gte: new Date(+params.year, 0, 1),
-          $lte: new Date(+params.year + 1, 0, 0),
-        },
+        $and: [
+          { createdAt: { $gte: new Date(+params.year, 1, 1) } },
+          { createdAt: { $lte: new Date(+params.year + 1, 0, 0) } },
+        ],
       };
     }
 
     if (params && params.year && params.month && !params.day) {
       query = {
         ...query,
-        createdAt: {
-          $gte: new Date(+params.year, +params.month, 1),
-          $lte: new Date(+params.year, +params.month + 1, 0),
-        },
+        $and: [
+          { createdAt: { $gte: new Date(+params.year, +params.month, 1) } },
+          { createdAt: { $lte: new Date(+params.year, +params.month + 1, 1) } },
+        ],
       };
-
-      console.log({
-        $gte: new Date(+params.year, +params.month, 1),
-        $lte: new Date(+params.year, +params.month + 1, 0),
-      })
     }
 
     if (params && params.year && params.month && params.day) {
       query = {
         ...query,
-        createdAt: {
-          $gte: new Date(+params.year, +params.month, +params.day, 0, 0, 0),
-          $lte: new Date(+params.year, +params.month, +params.day + 1, 0, 0, 0),
-        },
+        $and: [
+          {
+            createdAt: {
+              $gte: new Date(+params.year, +params.month, +params.day, 0, 0, 0),
+            },
+          },
+          {
+            createdAt: {
+              $lte: new Date(
+                +params.year,
+                +params.month,
+                +params.day + 1,
+                0,
+                0,
+                0
+              ),
+            },
+          },
+        ],
       };
     }
 
@@ -96,10 +104,7 @@ class ExpenseService extends BaseService {
 
   async getStatistics(user_id, year) {
     try {
-      return await this.repository.getStatistics(
-        user_id,
-        +year,
-      );
+      return await this.repository.getStatistics(user_id, +year);
     } catch (error) {
       throw error;
     }
