@@ -94,20 +94,6 @@ async function getStatisticsByCategory(req, res, next) {
   }
 }
 
-async function getProfitPercentage(req, res, next) {
-  try {
-    const uid = req.user._id;
-
-    const percentage = await expenseService.getProfitPercentage(uid);
-
-    return res.status(200).json({
-      resource: percentage,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
 async function createExpense(req, res, next) {
   try {
     const uid = req.user._id;

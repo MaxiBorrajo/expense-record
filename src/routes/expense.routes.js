@@ -6,7 +6,6 @@ import {
   getAmount,
   getExpenseById,
   getExpenses,
-  getProfitPercentage,
   getStatistics,
   updateExpenseById,
   applyConversion,
@@ -32,8 +31,6 @@ router.get("/balance", isAuthenticated, getBalance); //✓
 router.get("/statistics", isAuthenticated, getStatistics); //✓
 
 router.get("/statisticsByCategory", isAuthenticated, getStatisticsByCategory); //✓
-
-router.get("/change", isAuthenticated, getProfitPercentage); //✓
 
 router.get("/:eid", isAuthenticated, getExpenseById); //✓
 

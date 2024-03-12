@@ -135,14 +135,6 @@ class ExpenseService extends BaseService {
     }
   }
 
-  async getProfitPercentage(user_id) {
-    try {
-      return await this.repository.profitPercentage(user_id);
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getAmount(user_id, params) {
     try {
       return await this.repository.getAmount(

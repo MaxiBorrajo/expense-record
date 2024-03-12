@@ -258,34 +258,6 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
-  async profitPercentage(user_id) {
-    //✓
-    try {
-      const currentAmount = await this.getAmount(user_id);
-      const previousAmount = await this.getAmount(
-        user_id,
-        new Date().getMonth() - 1 === -1
-          ? new Date().getFullYear() - 1
-          : new Date().getFullYear(),
-        new Date().getMonth() - 1 === -1 ? 11 : new Date().getMonth() - 1
-      );
-
-      const percentage =
-        previousAmount && currentAmount
-          ? ((currentAmount - previousAmount) / Math.abs(previousAmount)) * 100
-          : 0;
-
-      const nominal = previousAmount ? currentAmount - previousAmount : 0;
-
-      return {
-        percentage: percentage,
-        nominal: nominal,
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getBalance(user_id) {
     try {
       const result = await this.model.aggregate([
