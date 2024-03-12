@@ -172,7 +172,6 @@ export {
   getAmount,
   getExpenseById,
   getExpenses,
-  getProfitPercentage,
   getStatistics,
   updateExpenseById,
   applyConversion,
