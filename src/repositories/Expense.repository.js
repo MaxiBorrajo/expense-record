@@ -271,8 +271,8 @@ class ExpenseRepository extends BaseRepository {
       );
 
       const percentage =
-        previousAmount && currentAmount != 0
-          ? ((currentAmount - previousAmount) / Math.abs(currentAmount)) * 100
+        previousAmount && currentAmount
+          ? ((currentAmount - previousAmount) / Math.abs(previousAmount)) * 100
           : 0;
 
       const nominal = previousAmount ? currentAmount - previousAmount : 0;
