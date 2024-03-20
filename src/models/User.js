@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "USD",
     },
+    budget:{
+      type: Number
+    },
+    savingGoal:{
+      type: Number
+    }
   },
   {
     timestamps: true,
