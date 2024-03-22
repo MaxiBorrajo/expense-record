@@ -28,6 +28,17 @@ const expenseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "categories",
     },
+    isAutomaticallyCreated: {
+      type: Boolean,
+      default: false,
+    },
+    interval:{
+      type:Number,
+      required: function() { return this.isAutomaticallyCreated; }
+    },
+    jobId:{
+      type:String,
+    }
   },
   {
     timestamps: true,

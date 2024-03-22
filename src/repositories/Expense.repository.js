@@ -1,10 +1,57 @@
 import expense from "../models/Expense.js";
 import BaseRepository from "./Base.repository.js";
 import getExchangeRate from "../utils/exchangeRate.js";
-
 class ExpenseRepository extends BaseRepository {
   constructor() {
     super(expense);
+  }
+
+  async create(object) {
+    try {
+      object = await super.create(object);
+
+      if (object.isAutomaticallyCreated && !object.jobId) {
+        object.jobId = object._id;
+        await object.save();
+        //aca iria el schedule
+      }
+
+      return object;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateById(id, object) {
+    try {
+      object = await super.updateById(id, object);
+
+      //aca se borra el schedule
+
+      if (object.isAutomaticallyCreated && object.jobId) {
+        //aca se agrega el schedule
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteById(id) {
+    try {
+      const foundExpense = await this.getById(id);
+
+      if (foundExpense.isAutomaticallyCreated && foundExpense.jobId) {
+        //aca se elimina el schedule
+        await super.updateByFilter(
+          { jobId: foundExpense.jobId },
+          { isAutomaticallyCreated: false, interval: null, jobName: null }
+        );
+      }
+
+      super.deleteById(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getByFilter(filter) {
