@@ -6,7 +6,6 @@ import executeCategoryMock from "./mocks/category.mock.js";
 async function startServer() {
   try {
     databaseConnection();
-
     app.listen(process.env.PORT, () => {
       console.log(`Listening on port ${process.env.PORT}`);
     });
