@@ -19,7 +19,12 @@ import {
   DatabaseConnectionFailedError,
   InvalidCodeError,
   CodeExpiredError,
-  PasswordResetCodeAlreadyVerifiedError
+  PasswordResetCodeAlreadyVerifiedError,
+  JobsCouldNotBeLoadedError,
+  SavingGoalAlreadyExistsError,
+  SavingGoalMustBeGreaterThanZeroError,
+  BudgetMustBeGreaterThanZeroError,
+  SavingsMustBeLessThanZeroError
 } from "./customErrors.js";
 
 export const errors = {
@@ -43,5 +48,10 @@ export const errors = {
   DATABASE_CONNECTION_FAILED: DatabaseConnectionFailedError,
   INVALID_CODE: InvalidCodeError,
   CODE_EXPIRED: CodeExpiredError,
-  PASSWORD_RESET_CODE_ALREADY_VERIFIED: PasswordResetCodeAlreadyVerifiedError
+  PASSWORD_RESET_CODE_ALREADY_VERIFIED: PasswordResetCodeAlreadyVerifiedError,
+  JOBS_COULD_NOT_BE_LOADED: JobsCouldNotBeLoadedError,
+  SAVING_GOAL_ALREADY_EXISTS: SavingGoalAlreadyExistsError,
+  SAVING_GOAL_MUST_BE_GREATER_THAN_ZERO: SavingGoalMustBeGreaterThanZeroError,
+  BUDGET_MUST_BE_GREATER_THAN_ZERO: BudgetMustBeGreaterThanZeroError,
+  SAVINGS_MUST_BE_LESS_THAN_ZERO: SavingsMustBeLessThanZeroError
 };

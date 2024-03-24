@@ -3,6 +3,7 @@ import databaseConnection from "./config/database.connection.js";
 import executeExpenseMock from "./mocks/expenses.mock.js";
 import executeIconMock from "./mocks/icon.mock.js";
 import executeCategoryMock from "./mocks/category.mock.js";
+import { recoverJobs } from "./utils/scheduler.js";
 async function startServer() {
   try {
     databaseConnection();
@@ -10,8 +11,9 @@ async function startServer() {
       console.log(`Listening on port ${process.env.PORT}`);
     });
     //  await executeIconMock();
-   // await executeCategoryMock();
-   //await executeExpenseMock();
+    // await executeCategoryMock();
+    //await executeExpenseMock();
+    await recoverJobs();
   } catch (error) {
     throw error;
   }

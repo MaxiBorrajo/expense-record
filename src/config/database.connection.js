@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 import { errors } from "../utils/errorDictionary.js";
-
 mongoose.set("strictQuery", true);
 async function databaseConnection() {
   await mongoose
     .connect(process.env.MONGO_DB_URI)
-    .then((res) => {
+    .then(async (res) => {
       console.log("Successfully connected to database");
     })
     .catch((err) => {

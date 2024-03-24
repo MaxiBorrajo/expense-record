@@ -1,19 +1,70 @@
 import expense from "../models/Expense.js";
 import BaseRepository from "./Base.repository.js";
 import getExchangeRate from "../utils/exchangeRate.js";
+import {
+  programAutomaticRegister,
+  removeAutomaticRegister,
+} from "../utils/scheduler.js";
 class ExpenseRepository extends BaseRepository {
   constructor() {
     super(expense);
   }
 
+  async getMonthExpenses(month, user_id) {
+    try {
+      const result = await this.model.aggregate([
+        {
+          $match: {
+            user_id: user_id,
+            $and: [
+              {
+                createdAt: {
+                  $gte: new Date(new Date().getFullYear(), month, 1),
+                },
+              },
+              {
+                createdAt: {
+                  $lt: new Date(new Date().getFullYear(), month + 1, 0),
+                },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: {
+              $sum: {
+                $cond: {
+                  if: { $lt: ["$amount", 0] },
+                  then: "$amount",
+                  else: 0,
+                },
+              },
+            },
+          },
+        },
+      ]);
+
+      return result[0].total;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async create(object) {
     try {
-      object = await super.create(object);
+      object = await expense.create(object);
 
       if (object.isAutomaticallyCreated && !object.jobId) {
         object.jobId = object._id;
         await object.save();
-        //aca iria el schedule
+        programAutomaticRegister(
+          object.cron,
+          this.create,
+          object,
+          object.jobId
+        );
       }
 
       return object;
@@ -22,33 +73,27 @@ class ExpenseRepository extends BaseRepository {
     }
   }
 
-  async updateById(id, object) {
+  async updateByFilter(filter, object) {
     try {
-      object = await super.updateById(id, object);
+      object = await super.updateByFilter(filter, object);
 
-      //aca se borra el schedule
+      removeAutomaticRegister(object.jobId);
+
+      
 
       if (object.isAutomaticallyCreated && object.jobId) {
-        //aca se agrega el schedule
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deleteById(id) {
-    try {
-      const foundExpense = await this.getById(id);
-
-      if (foundExpense.isAutomaticallyCreated && foundExpense.jobId) {
-        //aca se elimina el schedule
-        await super.updateByFilter(
-          { jobId: foundExpense.jobId },
-          { isAutomaticallyCreated: false, interval: null, jobName: null }
+        programAutomaticRegister(
+          object.cron,
+          this.create,
+          object,
+          object.jobId
+        );
+      } else {
+        await this.updateManyByFilter(
+          { jobId: object.jobId },
+          { isAutomaticallyCreated: false, cron: null, jobId: null }
         );
       }
-
-      super.deleteById(id);
     } catch (error) {
       throw error;
     }

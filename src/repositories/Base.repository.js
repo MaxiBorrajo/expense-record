@@ -96,6 +96,16 @@ class BaseRepository {
       throw error;
     }
   }
+
+  async updateManyByFilter(filter, object) {
+    try {
+      const updatedObjects = await this.model.updateMany(filter, object);
+
+      return updatedObjects;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default BaseRepository;

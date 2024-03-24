@@ -29,12 +29,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "USD",
     },
-    budget:{
-      type: Number
+    budget: {
+      type: Number,
+      default:0,
+      validate: {
+        validator: function (value) {
+          return value > 0;
+        },
+        message: "The budget must be greater than zero",
+      },
     },
-    savingGoal:{
-      type: Number
-    }
+    blockNotifications: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

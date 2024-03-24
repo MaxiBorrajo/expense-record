@@ -10,6 +10,7 @@ import userRoute from "./routes/user.routes.js";
 import expenseRoute from "./routes/expense.routes.js";
 import iconRoute from "./routes/icon.routes.js";
 import categoryRoute from "./routes/category.routes.js";
+import savingGoalRoute from "./routes/savingGoal.routes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/users", userRoute);
 app.use("/api/expenses", expenseRoute);
 app.use("/api/icons", iconRoute);
 app.use("/api/categories", categoryRoute);
+app.use("/api/savingGoals", savingGoalRoute);
 
 app.use(errorHandlerMiddleware);
 
@@ -33,6 +35,5 @@ app.use(errorHandlerMiddleware);
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
 // });
-
 
 export default app;

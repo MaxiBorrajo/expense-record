@@ -11,9 +11,51 @@ export class BadRequestError extends CustomError {
   }
 }
 
+export class MustBeGreaterThanZeroError extends BadRequestError {
+  constructor(value) {
+    super(value + " must be greater than zero");
+  }
+}
+
+export class MustBeLowerThanZeroError extends BadRequestError {
+  constructor(value) {
+    super(value + " must be lower than zero");
+  }
+}
+
+export class SavingsMustBeLessThanZeroError extends MustBeLowerThanZeroError {
+  constructor() {
+    super("Savings");
+  }
+}
+
+export class BudgetMustBeGreaterThanZeroError extends MustBeGreaterThanZeroError {
+  constructor() {
+    super("Budget");
+  }
+}
+
+export class SavingGoalMustBeGreaterThanZeroError extends MustBeGreaterThanZeroError {
+  constructor() {
+    super("Saving goal");
+  }
+}
+
+export class SavingGoalAlreadyExistsError extends BadRequestError {
+  constructor() {
+    super("Saving goal already exists");
+  }
+}
+
 export class ServerError extends CustomError {
   constructor(message) {
     super(500, message);
+  }
+}
+
+export class JobsCouldNotBeLoadedError extends ServerError {
+  constructor() {
+    super("Jobs could not be loaded");
   }
 }
 

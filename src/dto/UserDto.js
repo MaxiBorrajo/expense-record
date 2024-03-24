@@ -8,5 +8,7 @@ export class UserDto {
     this.urlProfilePhoto = user.urlProfilePhoto;
     this.firstName = user.firstName;
     this.lastName = user.lastName;
+    this.blockNotifications = user.blockNotifications;
+    this.budget = user.budget;
   }
 }

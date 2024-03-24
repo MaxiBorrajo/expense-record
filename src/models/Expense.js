@@ -32,8 +32,8 @@ const expenseSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    interval:{
-      type:Number,
+    cron:{
+      type:String,
       required: function() { return this.isAutomaticallyCreated; }
     },
     jobId:{
