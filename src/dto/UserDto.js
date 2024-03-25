@@ -10,5 +10,6 @@ export class UserDto {
     this.lastName = user.lastName;
     this.blockNotifications = user.blockNotifications;
     this.budget = user.budget;
+    this.budgetWarning = user.budgetWarning;
   }
 }
