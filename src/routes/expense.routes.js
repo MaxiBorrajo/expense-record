@@ -11,6 +11,7 @@ import {
   applyConversion,
   getBalance,
   getStatisticsByCategory,
+  getMonthExpenses
 } from "../controllers/expense.controller.js";
 
 import {
@@ -31,6 +32,8 @@ router.get("/balance", isAuthenticated, getBalance); //✓
 router.get("/statistics", isAuthenticated, getStatistics); //✓
 
 router.get("/statisticsByCategory", isAuthenticated, getStatisticsByCategory); //✓
+
+router.get("/monthExpenses", isAuthenticated, getMonthExpenses); //✓
 
 router.get("/:eid", isAuthenticated, getExpenseById); //✓
 

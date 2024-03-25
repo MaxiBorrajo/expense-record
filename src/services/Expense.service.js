@@ -3,6 +3,7 @@ import BaseService from "./Base.service.js";
 import UserService from "./User.service.js";
 import SavingGoalService from "./SavingGoal.service.js";
 import { errors } from "../utils/errorDictionary.js";
+import user from "../models/User.js";
 class ExpenseService extends BaseService {
   constructor() {
     super(ExpenseRepository);
@@ -28,17 +29,36 @@ class ExpenseService extends BaseService {
     }
   }
 
+  async getMonthExpenses(month, user_id) {
+    const monthExpenses = await this.repository.getMonthExpenses(
+      month ? month : new Date().getMonth(),
+      user_id
+    );
+
+    return monthExpenses;
+  }
+
   async updateByFilter(filter, object) {
     try {
       const foundObject = await this.getById(filter._id);
 
-      if (this.isASaving(foundObject) && object && !object.category_id && object.amount >= 0) {
+      if (
+        this.isASaving(foundObject) &&
+        object &&
+        !object.category_id &&
+        object.amount >= 0
+      ) {
         throw new errors.SAVINGS_MUST_BE_LESS_THAN_ZERO();
       }
 
       const updatedObject = await super.updateByFilter(filter, object);
 
-      if (this.isASaving(foundObject) || object.category_id === "65cf719ad7d2035b7f1ca18f") {
+      await this.recalculateBudgetSpent(filter.user_id);
+
+      if (
+        this.isASaving(foundObject) ||
+        object.category_id === "65cf719ad7d2035b7f1ca18f"
+      ) {
         await SavingGoalService.recalculateSavingGoal(filter.user_id);
       }
 
@@ -68,6 +88,29 @@ class ExpenseService extends BaseService {
     }
   }
 
+  async recalculateBudgetSpent(user_id) {
+    const currentUser = await UserService.getById(user_id);
+    const monthExpenses = await this.repository.getMonthExpenses(
+      new Date().getMonth(),
+      user._id
+    );
+    const percentageOfBudget = (monthExpenses / currentUser.budget) * 100;
+
+    if (currentUser.budget && monthExpenses > currentUser.budget) {
+      //push notification
+      console.log("Te pasaste del budget");
+    }
+
+    if (
+      currentUser.budget &&
+      monthExpenses <= currentUser.budget &&
+      percentageOfBudget >= currentUser.warningBudget
+    ) {
+      //push notification
+      console.log("Estas por pasarte del budget");
+    }
+  }
+
   async checkBudget(object) {
     const currentUser = await UserService.getById(object.user_id);
 
@@ -75,6 +118,30 @@ class ExpenseService extends BaseService {
       //push notification
       console.log("Te pasaste del budget");
     }
+
+    if (
+      !(await this.budgetOverpassed(currentUser, object.amount)) &&
+      (await this.budgetAlmostPassed(currentUser, object.amount))
+    ) {
+      //push notification
+      console.log("Estas por pasarte del budget");
+    }
+  }
+
+  async budgetAlmostPassed(user, amount) {
+    const monthExpenses = await this.repository.getMonthExpenses(
+      new Date().getMonth(),
+      user._id
+    );
+
+    const percentageOfBudget = (monthExpenses + amount / user.budget) * 100;
+
+    return (
+      user &&
+      user.budget &&
+      amount < 0 &&
+      percentageOfBudget >= user.warningBudget
+    );
   }
 
   async budgetOverpassed(user, amount) {

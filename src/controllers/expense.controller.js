@@ -1,5 +1,19 @@
 import expenseService from "../services/Expense.service.js";
 
+async function getMonthExpenses(req, res, next) {
+  try {
+    const uid = req.user._id;
+
+    const monthExpenses = await expenseService.getMonthExpenses(uid, req.query.month);
+
+    return res.status(200).json({
+      resource: monthExpenses,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getExpenses(req, res, next) {
   try {
     const uid = req.user._id;
@@ -176,5 +190,6 @@ export {
   updateExpenseById,
   applyConversion,
   getBalance,
-  getStatisticsByCategory
+  getStatisticsByCategory,
+  getMonthExpenses
 };

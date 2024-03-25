@@ -31,13 +31,17 @@ const userSchema = new mongoose.Schema(
     },
     budget: {
       type: Number,
-      default:0,
+      default: 0,
       validate: {
         validator: function (value) {
           return value > 0;
         },
         message: "The budget must be greater than zero",
       },
+    },
+    budgetWarning: {
+      type: Number,
+      default: 90,
     },
     blockNotifications: {
       type: Boolean,
