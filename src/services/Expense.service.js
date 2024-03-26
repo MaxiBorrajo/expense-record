@@ -103,7 +103,7 @@ class ExpenseService extends BaseService {
       monthExpenses > currentUser.budget &&
       !currentUser.blockNotifications
     ) {
-      console.log(notification)
+      
       const notification = await NotificationService.create({
         title: "¡You have exceeded your monthly budget!😱",
         body: `You have exceeded your monthly budget by $${+(
@@ -111,7 +111,7 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-
+      console.log(notification)
       await sendPushNotification(token, notification);
     }
 
@@ -127,7 +127,7 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-
+      console.log(notification)
       await sendPushNotification(token, notification);
     }
   }
@@ -152,7 +152,7 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-
+      console.log(notification)
       await sendPushNotification(token, notification);
     }
 
@@ -167,7 +167,7 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-
+      console.log(notification)
       await sendPushNotification(token, notification);
     }
   }
