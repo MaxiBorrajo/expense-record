@@ -178,6 +178,10 @@ class ExpenseService extends BaseService {
       user._id
     );
 
+    console.log(monthExpenses)
+
+    console.log(new Date().getMonth())
+
     const percentageOfBudget =
       (((monthExpenses + amount) * -1) / user.budget) * 100;
 
@@ -194,6 +198,10 @@ class ExpenseService extends BaseService {
       new Date().getMonth(),
       user._id
     );
+
+    console.log(monthExpenses)
+
+    console.log(new Date().getMonth())
 
     return (
       user &&
