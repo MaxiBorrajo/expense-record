@@ -38,8 +38,9 @@ class AuthService extends BaseService {
     try {
       const user = await this.repository.getByFilter({ email: object.email });
 
-      this.validateAuthMethod(user);
-      await this.validateUserCredentials(user, object.password);
+      if (user && !user.oauthuser) {
+        await this.validateUserCredentials(user, object.password);
+      }
 
       return {
         token: await user.generateAuthToken(user),
@@ -53,12 +54,6 @@ class AuthService extends BaseService {
   async validateUserCredentials(user, password) {
     if (!user || !(await user.matchPasswords(password))) {
       throw new errors.EMAIL_OR_PASSWORD_WRONG();
-    }
-  }
-
-  validateAuthMethod(user) {
-    if (user && user.oauthuser) {
-      throw new errors.BAD_LOGIN_METHOD();
     }
   }
 

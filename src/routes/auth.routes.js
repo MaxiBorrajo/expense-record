@@ -6,6 +6,7 @@ import {
   register,
   resetPassword,
   verifyCode,
+  handleGoogle
 } from "../controllers/auth.controller.js";
 
 import {
@@ -24,6 +25,12 @@ router.post(
   body_must_not_contain_attributes(["_id"]),
   body_must_contain_attributes(['lastName', 'firstName']),
   register
+);
+
+router.post(
+  "/google",
+  body_must_contain_attributes(["email"]),
+  handleGoogle
 );
 
 router.post(

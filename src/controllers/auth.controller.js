@@ -1,4 +1,20 @@
 import authService from "../services/Auth.service.js";
+import userService from "../services/User.service.js";
+
+async function handleGoogle(req, res, next) {
+  try {
+    const foundUser = await userService.getByFilter({ email: req.body.email });
+
+    if (foundUser) {
+      return await login(req, res, next);
+    } else {
+      return await register(req, res, next);
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function register(req, res, next) {
   try {
     const createdUser = await authService.create(req.body);
@@ -61,4 +77,11 @@ async function resetPassword(req, res, next) {
   }
 }
 
-export { register, forgotPassword, resetPassword, login, verifyCode };
+export {
+  register,
+  forgotPassword,
+  resetPassword,
+  login,
+  verifyCode,
+  handleGoogle,
+};

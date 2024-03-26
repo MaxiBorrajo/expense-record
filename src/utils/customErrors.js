@@ -107,12 +107,6 @@ export class ResetPasswordCodeExpiredError extends UnauthenticatedError {
   }
 }
 
-export class BadLoginMethodError extends BadRequestError {
-  constructor() {
-    super(`Bad login method`);
-  }
-}
-
 export class AttributeNotAllowedError extends BadRequestError {
   constructor(attribute) {
     super(`Attribute ${attribute} is not allowed`);

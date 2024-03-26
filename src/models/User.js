@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      required: function () {
+        return !this.oauthuser;
+      },
     },
     oauthuser: {
       type: Boolean,
