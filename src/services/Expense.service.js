@@ -103,6 +103,7 @@ class ExpenseService extends BaseService {
       monthExpenses > currentUser.budget &&
       !currentUser.blockNotifications
     ) {
+      console.log(notification)
       const notification = await NotificationService.create({
         title: "¡You have exceeded your monthly budget!😱",
         body: `You have exceeded your monthly budget by $${+(
