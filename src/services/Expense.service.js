@@ -139,7 +139,7 @@ class ExpenseService extends BaseService {
     );
     const percentageOfBudget =
       ((monthExpenses * -1) / currentUser.budget) * 100;
-    console.log(await this.budgetOverpassed(currentUser, object.amount));
+
     if (
       (await this.budgetOverpassed(currentUser, object.amount)) &&
       !currentUser.blockNotifications
@@ -177,9 +177,11 @@ class ExpenseService extends BaseService {
       user._id
     );
 
-    const percentageOfBudget =
-      (((monthExpenses + amount) * -1) / user.budget) * 100;
-
+    const percentageOfBudget = ((monthExpenses * -1) / user.budget) * 100;
+    console.log(user);
+    console.log(user.budget);
+    console.log(amount < 0);
+    console.log(percentageOfBudget >= user.budgetWarning);
     return (
       user &&
       user.budget &&
@@ -194,11 +196,13 @@ class ExpenseService extends BaseService {
       user._id
     );
 
+    console.log(user);
+    console.log(user.budget);
+    console.log(amount < 0);
+    console.log(monthExpenses * -1 > user.budget);
+
     return (
-      user &&
-      user.budget &&
-      amount < 0 &&
-      (monthExpenses + amount) * -1 > user.budget
+      user && user.budget && amount < 0 && monthExpenses * -1 > user.budget
     );
   }
 
