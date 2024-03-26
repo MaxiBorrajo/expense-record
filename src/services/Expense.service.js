@@ -110,7 +110,6 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-      console.log(notification);
       await sendPushNotification(token, notification);
     }
 
@@ -126,7 +125,6 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-      console.log(notification);
       await sendPushNotification(token, notification);
     }
   }
@@ -151,7 +149,6 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-      console.log(notification);
       await sendPushNotification(token, notification);
     }
 
@@ -166,7 +163,7 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-      console.log(notification);
+      
       await sendPushNotification(token, notification);
     }
   }
@@ -178,10 +175,7 @@ class ExpenseService extends BaseService {
     );
 
     const percentageOfBudget = ((monthExpenses * -1) / user.budget) * 100;
-    console.log(user);
-    console.log(user.budget);
-    console.log(amount < 0);
-    console.log(percentageOfBudget >= user.budgetWarning);
+
     return (
       user &&
       user.budget &&
@@ -195,11 +189,6 @@ class ExpenseService extends BaseService {
       new Date().getMonth(),
       user._id
     );
-
-    console.log(user);
-    console.log(user.budget);
-    console.log(amount < 0);
-    console.log(monthExpenses * -1 > user.budget);
 
     return (
       user && user.budget && amount < 0 && monthExpenses * -1 > user.budget
