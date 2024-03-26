@@ -6,12 +6,14 @@ import {
   readNotifications,
 } from "../controllers/notification.controller.js";
 
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
+
 const router = express.Router();
 
-router.get("/", getNotifications);
+router.get("/", isAuthenticated, getNotifications);
 
-router.put("/", readNotifications);
+router.put("/", isAuthenticated, readNotifications);
 
-router.delete("/:nid", deleteNotification);
+router.delete("/:nid", isAuthenticated, deleteNotification);
 
 export default router;
