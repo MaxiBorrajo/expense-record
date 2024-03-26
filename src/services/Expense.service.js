@@ -103,7 +103,6 @@ class ExpenseService extends BaseService {
       monthExpenses > currentUser.budget &&
       !currentUser.blockNotifications
     ) {
-      
       const notification = await NotificationService.create({
         title: "¡You have exceeded your monthly budget!😱",
         body: `You have exceeded your monthly budget by $${+(
@@ -111,7 +110,7 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-      console.log(notification)
+      console.log(notification);
       await sendPushNotification(token, notification);
     }
 
@@ -127,7 +126,7 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-      console.log(notification)
+      console.log(notification);
       await sendPushNotification(token, notification);
     }
   }
@@ -140,7 +139,7 @@ class ExpenseService extends BaseService {
     );
     const percentageOfBudget =
       ((monthExpenses * -1) / currentUser.budget) * 100;
-
+    console.log(await this.budgetOverpassed(currentUser, object.amount));
     if (
       (await this.budgetOverpassed(currentUser, object.amount)) &&
       !currentUser.blockNotifications
@@ -152,7 +151,7 @@ class ExpenseService extends BaseService {
           currentUser.budget
         ).toFixed(2)}`,
       });
-      console.log(notification)
+      console.log(notification);
       await sendPushNotification(token, notification);
     }
 
@@ -167,7 +166,7 @@ class ExpenseService extends BaseService {
           2
         )}% of your monthly budget`,
       });
-      console.log(notification)
+      console.log(notification);
       await sendPushNotification(token, notification);
     }
   }
@@ -177,10 +176,6 @@ class ExpenseService extends BaseService {
       new Date().getMonth(),
       user._id
     );
-
-    console.log(monthExpenses)
-
-    console.log(new Date().getMonth())
 
     const percentageOfBudget =
       (((monthExpenses + amount) * -1) / user.budget) * 100;
@@ -198,10 +193,6 @@ class ExpenseService extends BaseService {
       new Date().getMonth(),
       user._id
     );
-
-    console.log(monthExpenses)
-
-    console.log(new Date().getMonth())
 
     return (
       user &&
