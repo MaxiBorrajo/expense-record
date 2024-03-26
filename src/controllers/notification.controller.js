@@ -4,7 +4,7 @@ async function getNotifications(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const foundNotifications = await notificationService.getByFilter({
+    const foundNotifications = await notificationService.getAll({
       user_id: uid,
       read: false,
     });
