@@ -5,6 +5,8 @@ import {
   programAutomaticRegister,
   removeAutomaticRegister,
 } from "../utils/scheduler.js";
+import user from "../models/User.js";
+import savingGoal from "../models/SavingGoal.js";
 class ExpenseRepository extends BaseRepository {
   constructor() {
     super(expense);
@@ -78,8 +80,6 @@ class ExpenseRepository extends BaseRepository {
       object = await super.updateByFilter(filter, object);
 
       removeAutomaticRegister(object.jobId);
-
-      
 
       if (object.isAutomaticallyCreated && object.jobId) {
         programAutomaticRegister(
@@ -377,6 +377,16 @@ class ExpenseRepository extends BaseRepository {
   async applyConversion(user_id, oldCurrency, newCurrency) {
     try {
       const exchangeRate = await getExchangeRate(oldCurrency, newCurrency);
+
+      await user.findOneAndUpdate(
+        { _id: user_id },
+        { $mul: { budget: exchangeRate } }
+      );
+
+      await savingGoal.findOneAndUpdate(
+        { user_id: user_id },
+        { $mul: { final_amount: exchangeRate, current_amount: exchangeRate } }
+      );
 
       return await this.model.updateMany(
         { user_id: user_id },

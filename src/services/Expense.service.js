@@ -3,7 +3,8 @@ import BaseService from "./Base.service.js";
 import UserService from "./User.service.js";
 import SavingGoalService from "./SavingGoal.service.js";
 import { errors } from "../utils/errorDictionary.js";
-import user from "../models/User.js";
+import { sendPushNotification } from "../utils/sendNotification.js";
+import NotificationService from "../services/Notification.service.js";
 class ExpenseService extends BaseService {
   constructor() {
     super(ExpenseRepository);
@@ -17,11 +18,11 @@ class ExpenseService extends BaseService {
     );
   }
 
-  async deleteByFilter(filter) {
+  async deleteByFilter(filter, token) {
     try {
       const deletedObject = await super.deleteByFilter(filter);
 
-      await SavingGoalService.recalculateSavingGoal(filter.user_id);
+      await SavingGoalService.recalculateSavingGoal(filter.user_id, token);
 
       return deletedObject;
     } catch (error) {
@@ -38,7 +39,7 @@ class ExpenseService extends BaseService {
     return monthExpenses;
   }
 
-  async updateByFilter(filter, object) {
+  async updateByFilter(filter, object, token) {
     try {
       const foundObject = await this.getById(filter._id);
 
@@ -53,13 +54,13 @@ class ExpenseService extends BaseService {
 
       const updatedObject = await super.updateByFilter(filter, object);
 
-      await this.recalculateBudgetSpent(filter.user_id);
+      await this.recalculateBudgetSpent(filter.user_id, token);
 
       if (
         this.isASaving(foundObject) ||
         object.category_id === "65cf719ad7d2035b7f1ca18f"
       ) {
-        await SavingGoalService.recalculateSavingGoal(filter.user_id);
+        await SavingGoalService.recalculateSavingGoal(filter.user_id, token);
       }
 
       return updatedObject;
@@ -68,7 +69,7 @@ class ExpenseService extends BaseService {
     }
   }
 
-  async create(object) {
+  async create(object, token) {
     try {
       if (this.isASaving(object) && object.amount >= 0) {
         throw new errors.SAVINGS_MUST_BE_LESS_THAN_ZERO();
@@ -77,10 +78,10 @@ class ExpenseService extends BaseService {
       const createdObject = await super.create(object);
 
       if (this.isASaving(object)) {
-        await SavingGoalService.checkSavingGoal(createdObject);
+        await SavingGoalService.checkSavingGoal(createdObject, token);
       }
 
-      await this.checkBudget(object);
+      await this.checkBudget(object, token);
 
       return createdObject;
     } catch (error) {
@@ -88,43 +89,85 @@ class ExpenseService extends BaseService {
     }
   }
 
-  async recalculateBudgetSpent(user_id) {
+  async recalculateBudgetSpent(user_id, token) {
     const currentUser = await UserService.getById(user_id);
     const monthExpenses = await this.repository.getMonthExpenses(
       new Date().getMonth(),
-      user._id
+      user_id
     );
-    const percentageOfBudget = (monthExpenses / currentUser.budget) * 100;
+    const percentageOfBudget =
+      ((monthExpenses * -1) / currentUser.budget) * 100;
 
-    if (currentUser.budget && monthExpenses > currentUser.budget) {
-      //push notification
-      console.log("Te pasaste del budget");
+    if (
+      currentUser.budget &&
+      monthExpenses > currentUser.budget &&
+      !currentUser.blockNotifications
+    ) {
+      const notification = await NotificationService.create({
+        title: "¡You have exceeded your monthly budget!😱",
+        body: `You have exceeded your monthly budget by $${+(
+          monthExpenses * -1 -
+          currentUser.budget
+        ).toFixed(2)}`,
+      });
+
+      await sendPushNotification(token, notification);
     }
 
     if (
       currentUser.budget &&
       monthExpenses <= currentUser.budget &&
-      percentageOfBudget >= currentUser.warningBudget
+      percentageOfBudget >= currentUser.budgetWarning &&
+      !currentUser.blockNotifications
     ) {
-      //push notification
-      console.log("Estas por pasarte del budget");
+      const notification = await NotificationService.create({
+        title: "😰¡You are about to go over your monthly budget!",
+        body: `You have reached ${+percentageOfBudget.toFixed(
+          2
+        )}% of your monthly budget`,
+      });
+
+      await sendPushNotification(token, notification);
     }
   }
 
-  async checkBudget(object) {
+  async checkBudget(object, token) {
     const currentUser = await UserService.getById(object.user_id);
+    const monthExpenses = await this.repository.getMonthExpenses(
+      new Date().getMonth(),
+      object.user_id
+    );
+    const percentageOfBudget =
+      ((monthExpenses * -1) / currentUser.budget) * 100;
 
-    if (await this.budgetOverpassed(currentUser, object.amount)) {
-      //push notification
-      console.log("Te pasaste del budget");
+    if (
+      (await this.budgetOverpassed(currentUser, object.amount)) &&
+      !currentUser.blockNotifications
+    ) {
+      const notification = await NotificationService.create({
+        title: "¡You have exceeded your monthly budget!😱",
+        body: `You have exceeded your monthly budget by $${+(
+          monthExpenses * -1 -
+          currentUser.budget
+        ).toFixed(2)}`,
+      });
+
+      await sendPushNotification(token, notification);
     }
 
     if (
       !(await this.budgetOverpassed(currentUser, object.amount)) &&
-      (await this.budgetAlmostPassed(currentUser, object.amount))
+      (await this.budgetAlmostPassed(currentUser, object.amount)) &&
+      !currentUser.blockNotifications
     ) {
-      //push notification
-      console.log("Estas por pasarte del budget");
+      const notification = await NotificationService.create({
+        title: "😰¡You are about to go over your monthly budget!",
+        body: `You have reached ${+percentageOfBudget.toFixed(
+          2
+        )}% of your monthly budget`,
+      });
+
+      await sendPushNotification(token, notification);
     }
   }
 
@@ -134,13 +177,14 @@ class ExpenseService extends BaseService {
       user._id
     );
 
-    const percentageOfBudget = (monthExpenses + amount / user.budget) * 100;
+    const percentageOfBudget =
+      (((monthExpenses + amount) * -1) / user.budget) * 100;
 
     return (
       user &&
       user.budget &&
       amount < 0 &&
-      percentageOfBudget >= user.warningBudget
+      percentageOfBudget >= user.budgetWarning
     );
   }
 

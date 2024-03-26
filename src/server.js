@@ -11,6 +11,7 @@ import expenseRoute from "./routes/expense.routes.js";
 import iconRoute from "./routes/icon.routes.js";
 import categoryRoute from "./routes/category.routes.js";
 import savingGoalRoute from "./routes/savingGoal.routes.js";
+import notificationRoute from "./routes/notification.routes.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/expenses", expenseRoute);
 app.use("/api/icons", iconRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/savingGoals", savingGoalRoute);
+app.use("/api/notifications", notificationRoute);
 
 app.use(errorHandlerMiddleware);
 

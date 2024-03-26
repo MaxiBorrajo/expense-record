@@ -4,7 +4,10 @@ async function getMonthExpenses(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const monthExpenses = await expenseService.getMonthExpenses(uid, req.query.month);
+    const monthExpenses = await expenseService.getMonthExpenses(
+      uid,
+      req.query.month
+    );
 
     return res.status(200).json({
       resource: monthExpenses,
@@ -76,10 +79,7 @@ async function getStatistics(req, res, next) {
   try {
     const uid = req.user._id;
 
-    const statistics = await expenseService.getStatistics(
-      uid,
-      req.query.year,
-    );
+    const statistics = await expenseService.getStatistics(uid, req.query.year);
 
     return res.status(200).json({
       resource: statistics,
@@ -111,10 +111,11 @@ async function getStatisticsByCategory(req, res, next) {
 async function createExpense(req, res, next) {
   try {
     const uid = req.user._id;
+    const expo_token = req.get("ExpoToken");
 
     req.body = { ...req.body, user_id: uid };
 
-    const expense = await expenseService.create(req.body);
+    const expense = await expenseService.create(req.body, expo_token);
 
     return res.status(200).json({
       resource: expense,
@@ -127,13 +128,15 @@ async function createExpense(req, res, next) {
 async function updateExpenseById(req, res, next) {
   try {
     const uid = req.user._id;
+    const expo_token = req.get("ExpoToken");
 
     const updatedExpense = await expenseService.updateByFilter(
       {
         user_id: uid,
         _id: req.params.eid,
       },
-      req.body
+      req.body,
+      expo_token
     );
 
     return res.status(200).json({
@@ -148,11 +151,15 @@ async function updateExpenseById(req, res, next) {
 async function deleteExpenseById(req, res, next) {
   try {
     const uid = req.user._id;
+    const expo_token = req.get("ExpoToken");
 
-    await expenseService.deleteByFilter({
-      user_id: uid,
-      _id: req.params.eid,
-    });
+    await expenseService.deleteByFilter(
+      {
+        user_id: uid,
+        _id: req.params.eid,
+      },
+      expo_token
+    );
 
     return res.status(200).json({
       message: "Expense deleted successfully",
@@ -191,5 +198,5 @@ export {
   applyConversion,
   getBalance,
   getStatisticsByCategory,
-  getMonthExpenses
+  getMonthExpenses,
 };

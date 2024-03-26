@@ -1,76 +1,49 @@
-import { Expo } from 'expo-server-sdk';
+import { Expo } from "expo-server-sdk";
 
 let expo = new Expo({
-  useFcmV1: true
+  accessToken: process.env.EXPO_ACCESS_TOKEN,
+  useFcmV1: true, 
 });
 
-export const messages = [];
+let tickets = [];
+export async function sendPushNotification(token, notification) {
+  try {
+    let pushMessage = {
+      title: notification.title,
+      to: token,
+      body: notification.body,
+      data: { ...notification },
+    };
 
-
-export function addNotification(pushToken,body,data){
-    messages.push({
-    to:pushToken,
-    sound: 'notification.wav',
-    body: body,
-    data: data,
-    })
-}
-
-export function sendNotification()
-
-// Later, after the Expo push notification service has delivered the
-// notifications to Apple or Google (usually quickly, but allow the service
-// up to 30 minutes when under load), a "receipt" for each notification is
-// created. The receipts will be available for at least a day; stale receipts
-// are deleted.
-//
-// The ID of each receipt is sent back in the response "ticket" for each
-// notification. In summary, sending a notification produces a ticket, which
-// contains a receipt ID you later use to get the receipt.
-//
-// The receipts may contain error codes to which you must respond. In
-// particular, Apple or Google may block apps that continue to send
-// notifications to devices that have blocked notifications or have uninstalled
-// your app. Expo does not control this policy and sends back the feedback from
-// Apple and Google so you can handle it appropriately.
-let receiptIds = [];
-for (let ticket of tickets) {
-  // NOTE: Not all tickets have IDs; for example, tickets for notifications
-  // that could not be enqueued will have error information and no receipt ID.
-  if (ticket.id) {
-    receiptIds.push(ticket.id);
+    let ticket = await expo.sendPushNotificationsAsync([pushMessage]);
+    tickets.push(...ticket);
+  } catch (error) {
+    console.error("Error sending push notification:", error);
   }
 }
 
-let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
-(async () => {
-  // Like sending notifications, there are different strategies you could use
-  // to retrieve batches of receipts from the Expo service.
-  for (let chunk of receiptIdChunks) {
-    try {
-      let receipts = await expo.getPushNotificationReceiptsAsync(chunk);
-      console.log(receipts);
+export async function handleReceipts() {
+  let receiptIds = tickets.map((ticket) => ticket.id);
+  let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
+  let receipts = await Promise.all(
+    receiptIdChunks.map(
+      async (chunk) => await expo.getPushNotificationReceiptsAsync(chunk)
+    )
+  );
 
-      // The receipts specify whether Apple or Google successfully received the
-      // notification and information about an error, if one occurred.
-      for (let receiptId in receipts) {
-        let { status, message, details } = receipts[receiptId];
-        if (status === 'ok') {
-          continue;
-        } else if (status === 'error') {
-          console.error(
-            `There was an error sending a notification: ${message}`
-          );
-          if (details && details.error) {
-            // The error codes are listed in the Expo documentation:
-            // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
-            // You must handle the errors appropriately.
-            console.error(`The error code is ${details.error}`);
-          }
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  for (let receiptId in receipts) {
+    let { status, message, details } = receipts[receiptId];
+
+    handleReceipt(status, message, details);
   }
-})();
+}
+
+function handleReceipt(_status, message, details) {
+  if (_status === "error") {
+    console.error(`There was an error sending a notification: ${message}`);
+  }
+
+  if (_status === "error" && details && details.error) {
+    console.error(`The error code is ${details.error}`);
+  }
+}
