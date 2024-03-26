@@ -3,7 +3,7 @@ import express from "express";
 import {
   deleteNotification,
   getNotifications,
-  readNotifications,
+  readNotification,
 } from "../controllers/notification.controller.js";
 
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/", isAuthenticated, getNotifications);
 
-router.put("/", isAuthenticated, readNotifications);
+router.put("/:nid", isAuthenticated, readNotification);
 
 router.delete("/:nid", isAuthenticated, deleteNotification);
 

@@ -17,15 +17,15 @@ async function getNotifications(req, res, next) {
   }
 }
 
-async function readNotifications(req, res, next) {
+async function readNotification(req, res, next) {
   try {
     const uid = req.user._id;
-    const notificationsIds = req.body.notificationsIds;
+    const nid = req.params.nid;
 
     await notificationService.updateByFilter(
       {
         user_id: uid,
-        _id: { $in: notificationsIds },
+        _id: nid,
       },
       {
         read: true,
@@ -58,4 +58,4 @@ async function deleteNotification(req, res, next) {
   }
 }
 
-export { getNotifications, readNotifications, deleteNotification };
+export { getNotifications, readNotification, deleteNotification };
