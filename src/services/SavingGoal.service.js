@@ -58,6 +58,7 @@ class SavingGoalService extends BaseService {
         body: `¡Congratulations! You have reached your goal of $${savingGoal.final_amount.toFixed(
           2
         )}💸💰`,
+        user_id: user_id,
       });
 
       await sendPushNotification(token, notification);
@@ -85,6 +86,7 @@ class SavingGoalService extends BaseService {
         body: `¡Congratulations! You have reached your goal of $${+savingGoal.final_amount.toFixed(
           2
         )}💸💰`,
+        user_id: user_id,
       });
 
       await sendPushNotification(token, notification);

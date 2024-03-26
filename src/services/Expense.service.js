@@ -109,6 +109,7 @@ class ExpenseService extends BaseService {
           monthExpenses * -1 -
           currentUser.budget
         ).toFixed(2)}`,
+        user_id: user_id
       });
       await sendPushNotification(token, notification);
     }
@@ -124,6 +125,7 @@ class ExpenseService extends BaseService {
         body: `You have reached ${+percentageOfBudget.toFixed(
           2
         )}% of your monthly budget`,
+        user_id: user_id
       });
       await sendPushNotification(token, notification);
     }
@@ -148,6 +150,7 @@ class ExpenseService extends BaseService {
           monthExpenses * -1 -
           currentUser.budget
         ).toFixed(2)}`,
+        user_id: user_id
       });
       await sendPushNotification(token, notification);
     }
@@ -162,6 +165,7 @@ class ExpenseService extends BaseService {
         body: `You have reached ${+percentageOfBudget.toFixed(
           2
         )}% of your monthly budget`,
+        user_id: user_id
       });
       
       await sendPushNotification(token, notification);
