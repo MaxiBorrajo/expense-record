@@ -54,7 +54,7 @@ class SavingGoalService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "💯¡You reached your goal!🤑",
+        title: "¡You reached your goal!🤑",
         body: `¡Congratulations! You have reached your goal of $${savingGoal.final_amount.toFixed(
           2
         )}💸💰`,
@@ -82,7 +82,7 @@ class SavingGoalService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "💯¡You reached your goal!🤑",
+        title: "¡You reached your goal!🤑",
         body: `¡Congratulations! You have reached your goal of $${+savingGoal.final_amount.toFixed(
           2
         )}💸💰`,

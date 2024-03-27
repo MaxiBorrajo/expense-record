@@ -104,7 +104,7 @@ class ExpenseService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "¡You have exceeded your monthly budget!😱",
+        title: "¡You have exceeded your monthly budget! 😱",
         body: `You have exceeded your monthly budget by $${+(
           monthExpenses * -1 -
           currentUser.budget
@@ -121,7 +121,7 @@ class ExpenseService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "😰¡You are about to go over your monthly budget!",
+        title: "¡You are about to go over your monthly budget! 😰",
         body: `You have reached ${+percentageOfBudget.toFixed(
           2
         )}% of your monthly budget`,
@@ -145,7 +145,7 @@ class ExpenseService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "¡You have exceeded your monthly budget!😱",
+        title: "¡You have exceeded your monthly budget! 😱",
         body: `You have exceeded your monthly budget by $${+(
           monthExpenses * -1 -
           currentUser.budget
@@ -161,7 +161,7 @@ class ExpenseService extends BaseService {
       !currentUser.blockNotifications
     ) {
       const notification = await NotificationService.create({
-        title: "😰¡You are about to go over your monthly budget!",
+        title: "¡You are about to go over your monthly budget! 😰",
         body: `You have reached ${+percentageOfBudget.toFixed(
           2
         )}% of your monthly budget`,
